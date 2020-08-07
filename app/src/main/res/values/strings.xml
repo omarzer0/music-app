@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Music Player</string>
+    <string name="zero_start_time">0:00</string>
+</resources>
