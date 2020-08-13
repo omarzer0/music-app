@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".ui.DisplaySongsActivity"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:id="@+id/song_item_tv_title"
+        style="@style/TextStopTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintEnd_toStartOf="@+id/song_item_img_more"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="This is The Title" />
+
+    <TextView
+        android:id="@+id/song_item_tv_artist"
+        style="@style/TextStopTrack"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintEnd_toStartOf="@+id/view"
+        app:layout_constraintStart_toStartOf="@+id/song_item_tv_title"
+        app:layout_constraintTop_toBottomOf="@+id/song_item_tv_title"
+        tools:text="this is the artist" />
+
+    <TextView
+        android:id="@+id/song_item_tv_album"
+        style="@style/TextStopTrack"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintEnd_toEndOf="@+id/song_item_tv_title"
+        app:layout_constraintStart_toEndOf="@+id/view"
+        app:layout_constraintTop_toBottomOf="@+id/song_item_tv_title"
+        tools:text="this is album" />
+
+
+    <ImageView
+        android:id="@+id/song_item_img_more"
+        style="@style/TextStopTrack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_more"
+        app:layout_constraintBottom_toBottomOf="@+id/song_item_tv_artist"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/song_item_tv_title" />
+
+    <TextView
+        android:id="@+id/view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="-"
+        app:layout_constraintBottom_toBottomOf="@+id/song_item_tv_album"
+        app:layout_constraintEnd_toEndOf="@+id/song_item_tv_title"
+        app:layout_constraintStart_toStartOf="@+id/song_item_tv_title"
+        app:layout_constraintTop_toBottomOf="@+id/song_item_tv_title" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
