@@ -6,8 +6,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +25,6 @@ import com.azapps.musicplayer.R;
 import com.azapps.musicplayer.adapter.OnSongClickListener;
 import com.azapps.musicplayer.adapter.SongAdapter;
 import com.azapps.musicplayer.pojo.Song;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +33,8 @@ import static com.azapps.musicplayer.pojo.Constant.SEND_CLICKED_SONG_TO_MUSIC_AC
 
 public class DisplaySongsActivity extends AppCompatActivity implements OnSongClickListener {
 
-    private ArrayList<Song> songList ;
+    private ArrayList<Song> songList;
+    private ArrayList<Song> filteredArrayList;
     private SongAdapter adapter;
     private SongViewModel songViewModel;
 
@@ -39,11 +43,10 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_songs);
 
-        prepareFab();
-
+        prepareMoreOptionImg();
         setRecyclerView();
-
         modelViewInstantiate();
+        initEditTextSearchFunction();
     }
 
 
@@ -58,7 +61,6 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
             public void onChanged(List<Song> songs) {
                 songList = new ArrayList<>();
                 songList.addAll(songs);
-                Toast.makeText(DisplaySongsActivity.this, "done! " + songList.size(), Toast.LENGTH_SHORT).show();
                 adapter.submitList(songs);
             }
         });
@@ -81,15 +83,8 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
                 String year = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.YEAR));
                 long lastDateModified = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED));
                 long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
-                long duration;
-                try {
-                    duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
-                } catch (Exception e) {
-                    Log.e("error", "getMusic: " + e.getMessage());
-                    duration = 0;
-                }
                 // Save to audioList
-                Song song = new Song(title, displayName, artist, album, data, year, lastDateModified, size, duration);
+                Song song = new Song(title, displayName, artist, album, data, year, lastDateModified, size);
 //                songList.add(song);
                 songViewModel.insert(song);
 
@@ -103,21 +98,27 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         RecyclerView recyclerView = findViewById(R.id.activity_display_songs_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.hasFixedSize();
+        recyclerView.setItemAnimator(null);
         adapter = new SongAdapter(this);
-//        adapter.submitList(songList);
         recyclerView.setAdapter(adapter);
     }
 
     @Override
     public void onSongClick(int position) {
         Intent intent = new Intent(this, MusicPlayerActivity.class);
-        intent.putExtra(SEND_CLICKED_SONG_TO_MUSIC_ACTIVITY, songList.get(position));
+        Song song = null;
+        if (filteredArrayList == null) {
+            song = songList.get(position);
+        }else {
+           song =  filteredArrayList.get(position);
+        }
+        intent.putExtra(SEND_CLICKED_SONG_TO_MUSIC_ACTIVITY, song);
         startActivity(intent);
     }
 
-    private void prepareFab() {
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+    private void prepareMoreOptionImg() {
+        ImageView moreOptionsImg = findViewById(R.id.activity_display_songs_img_more_options);
+        moreOptionsImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 freeDateBase();
@@ -138,4 +139,38 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
             e.getMessage();
         }
     }
+
+    private void initEditTextSearchFunction() {
+        EditText searchEditText = findViewById(R.id.activity_display_songs_ed_search_edit_text);
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                filterItems(s.toString());
+            }
+        });
+    }
+
+    private void filterItems(String text) {
+        filteredArrayList = new ArrayList<>();
+
+
+        for (Song song : songList) {
+            if (song.getTitle().toLowerCase().contains(text.toLowerCase())) {
+                filteredArrayList.add(song);
+            }
+        }
+
+        adapter.submitList(filteredArrayList);
+    }
+
 }

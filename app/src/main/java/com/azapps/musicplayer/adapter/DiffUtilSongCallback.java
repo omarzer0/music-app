@@ -15,7 +15,6 @@ public class DiffUtilSongCallback extends DiffUtil.ItemCallback<Song> {
     public boolean areContentsTheSame(@NonNull Song oldItem, @NonNull Song newItem) {
         return (oldItem.getTitle().equals(newItem.getTitle())
                 && oldItem.getData().equals(newItem.getData())
-                && oldItem.getDuration() == (newItem.getDuration())
                 && oldItem.getLastModifyDate() == (newItem.getLastModifyDate())
         );
     }

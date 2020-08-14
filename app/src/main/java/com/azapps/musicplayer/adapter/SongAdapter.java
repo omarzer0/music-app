@@ -1,6 +1,5 @@
 package com.azapps.musicplayer.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter;
 
 import com.azapps.musicplayer.R;
 import com.azapps.musicplayer.pojo.Song;
+
 
 public class SongAdapter extends ListAdapter<Song, SongViewHolder> {
     OnSongClickListener listener;

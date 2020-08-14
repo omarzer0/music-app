@@ -1,5 +1,8 @@
 package com.azapps.musicplayer.ui;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,7 +21,7 @@ import static com.azapps.musicplayer.pojo.Constant.SEND_CLICKED_SONG_TO_MUSIC_AC
 
 public class MusicPlayerActivity extends AppCompatActivity {
 
-    private ImageView playBtn;
+    private ImageView playBtn, songCoverImage;
     private SeekBar positionSeekBar;
     private TextView elapsedTimeLabel, remainingTimeLabel;
     private MediaPlayer mp;
@@ -57,7 +60,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
     private void prepareAndListenToPositionSeekBarChanges() {
         // position Bar
         positionSeekBar.setMax(totalTime);
-        positionSeekBar.setPadding(0,0,0,0);
+        positionSeekBar.setPadding(0, 0, 0, 0);
         positionSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -97,11 +100,12 @@ public class MusicPlayerActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        playBtn = findViewById(R.id.playBtn);
-        elapsedTimeLabel = findViewById(R.id.elapsedTimeLabel);
-        remainingTimeLabel = findViewById(R.id.remainingTimeLabel);
-        positionSeekBar = findViewById(R.id.positionSeekBar);
-        playBtn = findViewById(R.id.playBtn);
+        playBtn = findViewById(R.id.activity_music_player_playBtn);
+        songCoverImage = findViewById(R.id.activity_music_player_song_img_cover);
+        elapsedTimeLabel = findViewById(R.id.activity_music_player_elapsedTimeLabel);
+        remainingTimeLabel = findViewById(R.id.activity_music_player_remainingTimeLabel);
+        positionSeekBar = findViewById(R.id.activity_music_player_positionSeekBar);
+        playBtn = findViewById(R.id.activity_music_player_playBtn);
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,6 +116,20 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
     private void getSongExtra() {
         song = (Song) getIntent().getSerializableExtra(SEND_CLICKED_SONG_TO_MUSIC_ACTIVITY);
+
+        try {
+            String data = song.getData();
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(data);
+            byte[] coverBytes = retriever.getEmbeddedPicture();
+            Bitmap songCover;
+
+            songCover = BitmapFactory.decodeByteArray(coverBytes, 0, coverBytes.length);
+            songCoverImage.setImageBitmap(songCover);
+        } catch (Exception e) {
+            e.getMessage();
+            songCoverImage.setImageResource(R.drawable.song_not_found_background_image);
+        }
     }
 
     private String createTimeLabel(int time) {
@@ -135,6 +153,22 @@ public class MusicPlayerActivity extends AppCompatActivity {
             // mediaPlayer is in play state
             mp.pause();
             playBtn.setImageResource(R.drawable.ic_play_button);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        releaseMediaPlayer();
+    }
+
+    private void releaseMediaPlayer() {
+        if (mp != null) {
+            mSeekBarUpdateHandler.removeCallbacks(mUpdateSeekBar);
+            mp.release();
+            mp = null;
+            //release audio focus
+//            mAudioManager.abandonAudioFocus(mOnAudioFoucsChangeListener);
         }
     }
 }

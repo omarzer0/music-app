@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Music Player</string>
+    <string name="search_for_songs"><font size="14">ابحث عن الموسيقي</font></string>
+</resources>

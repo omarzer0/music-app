@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".ui.DisplaySongsActivity"
     android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp">
+    android:layout_marginBottom="8dp"
+    tools:context=".ui.DisplaySongsActivity">
 
     <TextView
         android:id="@+id/song_item_tv_title"
@@ -14,7 +14,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="48dp"
         android:ellipsize="end"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"

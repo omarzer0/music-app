@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">Music Player</string>
-    <string name="zero_start_time">0:00</string>
+    <string name="app_name" translatable="false">Music Player</string>
+    <string name="zero_start_time" translatable="false">0:00</string>
+    <string name="search_for_songs"><font size="14">search for music</font></string>
 </resources>
