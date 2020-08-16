@@ -24,6 +24,8 @@
             android:screenOrientation="portrait">
 
         </activity>
+
+        <service android:name=".ui.BackgroundMusicService" android:enabled="true"/>
     </application>
 
 </manifest>

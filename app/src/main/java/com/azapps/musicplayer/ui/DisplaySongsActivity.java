@@ -106,7 +106,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
     @Override
     public void onSongClick(int position) {
         Intent intent = new Intent(this, MusicPlayerActivity.class);
-        Song song = null;
+        Song song;
         if (filteredArrayList == null) {
             song = songList.get(position);
         }else {
