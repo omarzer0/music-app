@@ -34,7 +34,7 @@ public class SongRepository {
         new UpdateSongAsyncTask(songDao).execute(song);
     }
 
-    public void deleteAllSongs(){
+    public void deleteAllSongs() {
         new DeleteAllSongAsyncTask(songDao).execute();
     }
 

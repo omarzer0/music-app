@@ -34,7 +34,7 @@ public class SongViewModel extends AndroidViewModel {
         repository.delete(song);
     }
 
-    public void deleteAllSongs(){
+    public void deleteAllSongs() {
         repository.deleteAllSongs();
     }
 

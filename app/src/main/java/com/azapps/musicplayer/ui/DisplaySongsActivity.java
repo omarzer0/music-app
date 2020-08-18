@@ -10,8 +10,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,10 +38,23 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
     private SongAdapter adapter;
     private SongViewModel songViewModel;
 
+    private Button next, previous;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_songs);
+
+        next = findViewById(R.id.activity_display_songs_next_btn);
+        previous = findViewById(R.id.activity_display_songs_previous_btn);
+
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(DisplaySongsActivity.this, "next", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
         prepareMoreOptionImg();
         setRecyclerView();
@@ -109,21 +122,23 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         Song song;
         if (filteredArrayList == null) {
             song = songList.get(position);
-        }else {
-           song =  filteredArrayList.get(position);
+        } else {
+            song = filteredArrayList.get(position);
         }
         intent.putExtra(SEND_CLICKED_SONG_TO_MUSIC_ACTIVITY, song);
         startActivity(intent);
     }
 
     private void prepareMoreOptionImg() {
-        ImageView moreOptionsImg = findViewById(R.id.activity_display_songs_img_more_options);
+        Button moreOptionsImg = findViewById(R.id.activity_display_songs_img_more_options);
         moreOptionsImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 freeDateBase();
                 try {
                     getMusic();
+                    if (songList.size() == 0)
+                        Toast.makeText(DisplaySongsActivity.this, "oooops! no music was found", Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
                     Log.e("error", "onCreate: " + e.getMessage());
                     Toast.makeText(DisplaySongsActivity.this, "Error can't load any song", Toast.LENGTH_SHORT).show();

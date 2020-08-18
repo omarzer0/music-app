@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -23,7 +24,8 @@ import static com.azapps.musicplayer.pojo.Constant.SEND_CLICKED_SONG_TO_MUSIC_AC
 
 public class MusicPlayerActivity extends AppCompatActivity {
 
-    private ImageView playBtn, songCoverImage;
+    private ImageView songCoverImage;
+    private Button playBtn;
     private SeekBar positionSeekBar;
     private TextView elapsedTimeLabel, remainingTimeLabel;
     private MediaPlayer mp;
@@ -153,11 +155,11 @@ public class MusicPlayerActivity extends AppCompatActivity {
             // mediaPlayer is in pause state
             mp.start();
             mSeekBarUpdateHandler.postDelayed(mUpdateSeekBar, 0);
-            playBtn.setImageResource(R.drawable.ic_pause);
+            playBtn.setBackgroundResource(R.drawable.ic_pause);
         } else {
             // mediaPlayer is in play state
             mp.pause();
-            playBtn.setImageResource(R.drawable.ic_play_button);
+            playBtn.setBackgroundResource(R.drawable.ic_play_button);
         }
     }
 

@@ -12,6 +12,7 @@ import com.azapps.musicplayer.pojo.Song;
 public abstract class SongDatabase extends RoomDatabase {
 
     private static SongDatabase INSTANCE;
+
     public abstract SongDao songDao();
 
     public static synchronized SongDatabase getInstance(Context context) {
