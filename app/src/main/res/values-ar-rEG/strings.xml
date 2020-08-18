@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Music Player</string>
     <string name="search_for_songs"><font size="14">ابحث عن الموسيقي</font></string>
+    <string name="choose_a_song">اختر موسيقى</string>
 </resources>

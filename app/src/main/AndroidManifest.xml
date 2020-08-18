@@ -13,6 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".ui.DisplaySongsActivity"
+            android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,7 +26,6 @@
 
         </activity>
 
-        <service android:name=".ui.BackgroundMusicService" android:enabled="true"/>
     </application>
 
 </manifest>

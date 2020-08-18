@@ -2,8 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_display_songs_root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    android:clickable="true"
+    android:focusable="true"
     android:background="#fff"
     tools:context=".ui.DisplaySongsActivity">
 
@@ -55,33 +59,34 @@
         android:id="@+id/activity_display_songs_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/activity_display_songs_constraint_layout_bottom_play_control"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/activity_display_songs_search_bar_constraintLayout"
         tools:listitem="@layout/song_item" />
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/activity_display_songs_constraint_layout_bottom_play_control"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:background="#fff"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
             android:id="@+id/activity_display_songs_now_playing_song_image_view"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/song_not_found_background_image"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/song_not_found_background_image" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/activity_display_songs_controller_root_view"
@@ -95,8 +100,8 @@
 
             <Button
                 android:id="@+id/activity_display_songs_previous_btn"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:background="@drawable/ic_previous"
                 android:layoutDirection="ltr"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -107,8 +112,8 @@
 
             <Button
                 android:id="@+id/activity_display_songs_play_btn"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:background="@drawable/ic_play_button"
                 android:layoutDirection="ltr"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -117,8 +122,8 @@
 
             <Button
                 android:id="@+id/activity_display_songs_next_btn"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:background="@drawable/ic_next"
                 android:layoutDirection="ltr"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -128,17 +133,20 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
+            android:id="@+id/activity_display_songs_now_playing_song_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="32dp"
             android:ellipsize="end"
             android:singleLine="true"
+            android:text="@string/choose_a_song"
+            android:textAlignment="viewStart"
+            android:textColor="#000"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/activity_display_songs_controller_root_view"
             app:layout_constraintStart_toEndOf="@+id/activity_display_songs_now_playing_song_image_view"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="this is name test " />
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

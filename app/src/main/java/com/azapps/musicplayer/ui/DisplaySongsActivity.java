@@ -1,8 +1,11 @@
 package com.azapps.musicplayer.ui;
 
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -12,9 +15,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -26,35 +32,36 @@ import com.azapps.musicplayer.adapter.OnSongClickListener;
 import com.azapps.musicplayer.adapter.SongAdapter;
 import com.azapps.musicplayer.pojo.Song;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.azapps.musicplayer.pojo.Constant.SEND_CLICKED_SONG_TO_MUSIC_ACTIVITY;
+public class DisplaySongsActivity extends AppCompatActivity implements OnSongClickListener, View.OnClickListener {
 
-public class DisplaySongsActivity extends AppCompatActivity implements OnSongClickListener {
-
+    // ui
     private ArrayList<Song> songList;
     private ArrayList<Song> filteredArrayList;
     private SongAdapter adapter;
     private SongViewModel songViewModel;
 
-    private Button next, previous;
+    private Button previousBtn, playBtn, nextBtn;
+    private EditText searchEditText;
+    private ImageView nowPlayingImageView;
+    private TextView nowPlayingTextView;
+    private ConstraintLayout bottomControlConstraintLayout;
+
+    private MediaPlayer mp;
+
+    // vars
+    private int currentSongClickedPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_songs);
 
-        next = findViewById(R.id.activity_display_songs_next_btn);
-        previous = findViewById(R.id.activity_display_songs_previous_btn);
-
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(DisplaySongsActivity.this, "next", Toast.LENGTH_SHORT).show();
-            }
-        });
-
+        initViews();
+        initMediaPlayer();
 
         prepareMoreOptionImg();
         setRecyclerView();
@@ -62,6 +69,25 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         initEditTextSearchFunction();
     }
 
+    private void initViews() {
+        mp = new MediaPlayer();
+        previousBtn = findViewById(R.id.activity_display_songs_previous_btn);
+        playBtn = findViewById(R.id.activity_display_songs_play_btn);
+        nextBtn = findViewById(R.id.activity_display_songs_next_btn);
+        searchEditText = findViewById(R.id.activity_display_songs_ed_search_edit_text);
+        nowPlayingImageView = findViewById(R.id.activity_display_songs_now_playing_song_image_view);
+        nowPlayingTextView = findViewById(R.id.activity_display_songs_now_playing_song_title);
+        bottomControlConstraintLayout = findViewById(R.id.activity_display_songs_constraint_layout_bottom_play_control);
+
+        setListeners();
+    }
+
+    private void setListeners() {
+        previousBtn.setOnClickListener(this);
+        playBtn.setOnClickListener(this);
+        nextBtn.setOnClickListener(this);
+        bottomControlConstraintLayout.setOnClickListener(this);
+    }
 
     private void modelViewInstantiate() {
         songViewModel = new ViewModelProvider(this,
@@ -118,15 +144,37 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
 
     @Override
     public void onSongClick(int position) {
-        Intent intent = new Intent(this, MusicPlayerActivity.class);
+        currentSongClickedPosition = position;
+        Song song = detectFromWhichList(position);
+        playMusic(song);
+    }
+
+    private Song detectFromWhichList(int position) {
         Song song;
         if (filteredArrayList == null) {
             song = songList.get(position);
         } else {
             song = filteredArrayList.get(position);
         }
-        intent.putExtra(SEND_CLICKED_SONG_TO_MUSIC_ACTIVITY, song);
-        startActivity(intent);
+        return song;
+    }
+
+    private void playMusic(Song song) {
+        String songData = song.getData();
+        String songTitle = song.getTitle();
+        setImageToPlayerControl(songData);
+        setTitleToPlayerControl(songTitle);
+        Uri uri = Uri.parse(songData);
+        mp.reset();
+        initMediaPlayer();
+        try {
+            mp.setDataSource(this, uri);
+            mp.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        playBtnClicked();
+        mp.start();
     }
 
     private void prepareMoreOptionImg() {
@@ -156,7 +204,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
     }
 
     private void initEditTextSearchFunction() {
-        EditText searchEditText = findViewById(R.id.activity_display_songs_ed_search_edit_text);
+
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -188,4 +236,95 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         adapter.submitList(filteredArrayList);
     }
 
+    private void setImageToPlayerControl(String data) {
+        try {
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(data);
+            byte[] coverBytes = retriever.getEmbeddedPicture();
+            Bitmap songCover;
+
+            songCover = BitmapFactory.decodeByteArray(coverBytes, 0, coverBytes.length);
+            nowPlayingImageView.setImageBitmap(songCover);
+        } catch (Exception e) {
+            e.getMessage();
+            nowPlayingImageView.setImageResource(R.drawable.song_not_found_background_image);
+        }
+    }
+
+    private void setTitleToPlayerControl(String songTitle) {
+        nowPlayingTextView.setText(songTitle);
+    }
+
+    private void initMediaPlayer() {
+        mp.setLooping(true);
+        mp.seekTo(0);
+        mp.setVolume(1.0f, 1.0f);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.activity_display_songs_previous_btn:
+                previousBtnClicked();
+                break;
+            case R.id.activity_display_songs_play_btn:
+                playBtnClicked();
+                break;
+            case R.id.activity_display_songs_next_btn:
+                nextBtnClicked();
+                break;
+            case R.id.activity_display_songs_constraint_layout_bottom_play_control:
+                controlBodyClicked();
+                break;
+        }
+    }
+
+    private void nextBtnClicked() {
+        if (currentSongClickedPosition >= songList.size() - 1) {
+            currentSongClickedPosition = 0;
+        } else {
+            currentSongClickedPosition++;
+        }
+        playMusic(songList.get(currentSongClickedPosition));
+    }
+
+    private void previousBtnClicked() {
+        if (currentSongClickedPosition - 1 < 0) {
+            currentSongClickedPosition = songList.size() - 1;
+        } else {
+            currentSongClickedPosition--;
+        }
+        playMusic(songList.get(currentSongClickedPosition));
+    }
+
+    private void controlBodyClicked() {
+//        Intent intent = new Intent(this, MusicPlayerActivity.class);
+//        Song song = detectFromWhichList(currentSongClickedPosition);
+//        intent.putExtra(SEND_CLICKED_SONG_TO_MUSIC_ACTIVITY, song);
+//        startActivity(intent);
+    }
+
+    private void playBtnClicked() {
+        if (!mp.isPlaying()) {
+            mp.start();
+            playBtn.setBackgroundResource(R.drawable.ic_pause);
+        } else {
+            mp.pause();
+            playBtn.setBackgroundResource(R.drawable.ic_play_button);
+        }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        releaseMediaPlayer();
+    }
+
+    private void releaseMediaPlayer() {
+        if (mp != null) {
+            mp.release();
+            mp = null;
+        }
+    }
 }
