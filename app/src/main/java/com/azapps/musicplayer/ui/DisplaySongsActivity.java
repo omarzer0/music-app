@@ -1,6 +1,7 @@
 package com.azapps.musicplayer.ui;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,6 +36,8 @@ import com.azapps.musicplayer.pojo.Song;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.azapps.musicplayer.pojo.Constant.SEND_CLICKED_SONG_TO_MUSIC_ACTIVITY;
 
 public class DisplaySongsActivity extends AppCompatActivity implements OnSongClickListener, View.OnClickListener {
 
@@ -298,10 +301,12 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
     }
 
     private void controlBodyClicked() {
-//        Intent intent = new Intent(this, MusicPlayerActivity.class);
-//        Song song = detectFromWhichList(currentSongClickedPosition);
-//        intent.putExtra(SEND_CLICKED_SONG_TO_MUSIC_ACTIVITY, song);
-//        startActivity(intent);
+        if (currentSongClickedPosition != -1) {
+        Intent intent = new Intent(this, MusicPlayerActivity.class);
+        Song song = detectFromWhichList(currentSongClickedPosition);
+        intent.putExtra(SEND_CLICKED_SONG_TO_MUSIC_ACTIVITY, song);
+        startActivity(intent);
+        }
     }
 
     private void playBtnClicked() {
