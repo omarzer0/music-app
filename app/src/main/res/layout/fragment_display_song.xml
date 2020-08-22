@@ -8,8 +8,7 @@
     android:focusableInTouchMode="true"
     android:clickable="true"
     android:focusable="true"
-    android:background="#fff"
-    tools:context=".ui.DisplaySongsActivity">
+    android:background="#fff">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
