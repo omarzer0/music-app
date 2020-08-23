@@ -1,6 +1,10 @@
 package com.azapps.musicplayer.ui;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,10 +36,21 @@ import com.azapps.musicplayer.adapter.OnSongClickListener;
 import com.azapps.musicplayer.adapter.SongAdapter;
 import com.azapps.musicplayer.pojo.Song;
 import com.azapps.musicplayer.pojo.Utils;
+import com.azapps.musicplayer.service.MusicService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.azapps.musicplayer.pojo.Constant.ACTION_NAME;
+import static com.azapps.musicplayer.pojo.Constant.ACTION_NEXT;
+import static com.azapps.musicplayer.pojo.Constant.ACTION_PLAY;
+import static com.azapps.musicplayer.pojo.Constant.ACTION_PREVIOUS;
+import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_TAG;
+import static com.azapps.musicplayer.pojo.Constant.MUSIC_BROADCAST_SEND_INTENT;
+import static com.azapps.musicplayer.pojo.Constant.SEND_IS_PLAYING_BOOLEAN_EXTRA;
+import static com.azapps.musicplayer.pojo.Constant.SEND_SONG_DATA_STRING_EXTRA;
+import static com.azapps.musicplayer.pojo.Constant.SEND_SONG_TITLE_STRING_EXTRA;
 
 public class DisplaySongsActivity extends AppCompatActivity implements OnSongClickListener, View.OnClickListener {
 
@@ -282,6 +297,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
     }
 
     public void nextBtnClicked() {
+        startMyService();
         if (currentSongClickedPosition >= songList.size() - 1) {
             currentSongClickedPosition = 0;
         } else {
@@ -292,6 +308,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
     }
 
     public void previousBtnClicked() {
+        startMyService();
         if (currentSongClickedPosition - 1 < 0) {
             currentSongClickedPosition = songList.size() - 1;
         } else {
@@ -313,12 +330,23 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
 
 
     public void playBtnClicked() {
+        startMyService();
         if (!mp.isPlaying() && currentSongClickedPosition != -1) {
             mp.start();
             playBtn.setBackgroundResource(R.drawable.ic_pause);
         } else {
             mp.pause();
             playBtn.setBackgroundResource(R.drawable.ic_play_button);
+        }
+    }
+
+    public void startMyService() {
+        if (mp != null && currentSongClickedPosition != -1) {
+            Intent serviceIntent = new Intent(DisplaySongsActivity.this, MusicService.class);
+            serviceIntent.putExtra(SEND_IS_PLAYING_BOOLEAN_EXTRA, mp.isPlaying());
+            serviceIntent.putExtra(SEND_SONG_DATA_STRING_EXTRA, getSongData());
+            serviceIntent.putExtra(SEND_SONG_TITLE_STRING_EXTRA, getSongTitle());
+            startService(serviceIntent);
         }
     }
 
@@ -350,11 +378,42 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         return mp.getDuration();
     }
 
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getExtras().getString(ACTION_NAME);
+            MusicPlayerFragment fragment = (MusicPlayerFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+            if (!(fragment != null && fragment.isVisible()))
+                switch (action) {
+                    case ACTION_PREVIOUS:
+                        previousBtnClicked();
+                        break;
+
+                    case ACTION_PLAY:
+                        playBtnClicked();
+                        break;
+
+                    case ACTION_NEXT:
+                        nextBtnClicked();
+                        break;
+
+                }
+        }
+    };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        registerReceiver(broadcastReceiver, new IntentFilter(MUSIC_BROADCAST_SEND_INTENT));
+    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         releaseMediaPlayer();
+        unregisterReceiver(broadcastReceiver);
+        Intent serviceIntent = new Intent(this, MusicService.class);
+        stopService(serviceIntent);
     }
 
     private void releaseMediaPlayer() {

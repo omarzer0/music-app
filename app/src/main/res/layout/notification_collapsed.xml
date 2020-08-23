@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layoutDirection="ltr">
+
+    <ImageView
+        android:id="@+id/notification_collapsed_song_image_image_view"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/song_not_found_background_image" />
+
+    <TextView
+        android:id="@+id/notification_collapsed_song_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="16dp"
+        android:layout_toStartOf="@id/notification_collapsed_song_image_image_view"
+        android:layout_toEndOf="@id/notification_collapsed_controller_view"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textAlignment="viewEnd"
+        android:textColor="#000"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginEnd="8dp"
+        tools:text="This is a Title" />
+
+    <RelativeLayout
+        android:id="@+id/notification_collapsed_controller_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true">
+
+        <ImageView
+            android:id="@+id/notification_collapsed_previous_btn"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/ic_previous"
+            android:layoutDirection="ltr" />
+
+        <ImageView
+            android:id="@+id/notification_collapsed_play_btn"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_toEndOf="@id/notification_collapsed_previous_btn"
+            android:src="@drawable/ic_play_button"
+            android:layoutDirection="ltr" />
+
+        <ImageView
+            android:id="@+id/notification_collapsed_next_btn"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_toEndOf="@id/notification_collapsed_play_btn"
+            android:src="@drawable/ic_next"
+            android:layoutDirection="ltr" />
+
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

@@ -1,6 +1,9 @@
 package com.azapps.musicplayer.ui;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
@@ -16,11 +19,16 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.azapps.musicplayer.R;
+
+import static com.azapps.musicplayer.pojo.Constant.ACTION_NAME;
+import static com.azapps.musicplayer.pojo.Constant.ACTION_NEXT;
+import static com.azapps.musicplayer.pojo.Constant.ACTION_PLAY;
+import static com.azapps.musicplayer.pojo.Constant.ACTION_PREVIOUS;
+import static com.azapps.musicplayer.pojo.Constant.MUSIC_BROADCAST_SEND_INTENT;
 
 public class MusicPlayerFragment extends Fragment implements View.OnClickListener {
 
@@ -59,16 +67,6 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         return fragment;
     }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -86,7 +84,6 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         View view = inflater.inflate(R.layout.fragment_music_player, container, false);
-
         initViews(view);
         getSongExtra();
         prepareAndListenToPositionSeekBarChanges();
@@ -95,6 +92,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
 
         return view;
     }
+
 
     private void initViews(View view) {
         playBtn = view.findViewById(R.id.fragment_music_player_playBtn);
@@ -156,10 +154,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
             public void run() {
                 currentPosition = ((DisplaySongsActivity) getActivity()).getCurrentSongPosition();
                 positionSeekBar.setProgress(currentPosition);
-                Log.e("TAG", "run: " + currentPosition);
-//                ((DisplaySongsActivity)getActivity()).setCurrentSongPosition(progress);
                 mSeekBarUpdateHandler.postDelayed(this, 50);
-
                 String elapsedTime = createTimeLabel(currentPosition);
                 elapsedTimeLabel.setText(elapsedTime);
 
@@ -227,6 +222,55 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         }
     }
 
+//    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            String action = intent.getExtras().getString(ACTION_NAME);
+//            switch (action) {
+//                case ACTION_PLAY:
+//                    play();
+//                    break;
+//
+//            }
+//        }
+//    };
+
+    private IntentFilter filter = new IntentFilter(MUSIC_BROADCAST_SEND_INTENT);
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getExtras().getString(ACTION_NAME);
+            Log.e("TAG", "onReceive: " + action);
+            switch (action) {
+
+                case ACTION_PREVIOUS:
+                    ((DisplaySongsActivity) getActivity()).previousBtnClicked();
+                    play();
+                    getSongChanged();
+                    break;
+
+                case ACTION_PLAY:
+                    ((DisplaySongsActivity) getActivity()).playBtnClicked();
+                    play();
+                    break;
+
+                case ACTION_NEXT:
+                    ((DisplaySongsActivity) getActivity()).nextBtnClicked();
+                    play();
+                    getSongChanged();
+                    break;
+
+
+            }
+        }
+    };
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getActivity().registerReceiver(broadcastReceiver, filter);
+    }
+
     private void getSongChanged() {
         songData = ((DisplaySongsActivity) getActivity()).getSongData();
         songTitle = ((DisplaySongsActivity) getActivity()).getSongTitle();
@@ -236,10 +280,10 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         setTotalTimeLabel_TimeElapsed_SongTitleAndSongArtist();
     }
 
-
     @Override
     public void onDetach() {
         super.onDetach();
+        getActivity().unregisterReceiver(broadcastReceiver);
         getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         mSeekBarUpdateHandler.removeCallbacks(mUpdateSeekBar);
         ConstraintLayout constraintLayout = getActivity().findViewById(R.id.activity_display_songs_root_constraint);

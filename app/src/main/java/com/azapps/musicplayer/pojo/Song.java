@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @Entity(tableName = "song_table")
 //TODO: remember>>> change Serializable to Parcelable later
-public class Song implements Serializable {
+public class Song  {
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String title;
