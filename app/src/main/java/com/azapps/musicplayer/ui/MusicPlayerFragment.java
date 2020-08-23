@@ -21,27 +21,42 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.azapps.musicplayer.R;
-import com.azapps.musicplayer.pojo.Song;
 
-public class MusicPlayerFragment extends Fragment {
+public class MusicPlayerFragment extends Fragment implements View.OnClickListener {
 
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String TITLE_EXTRA = "title";
+    private static final String ARTIST_EXTRA = "artist";
+    private static final String DATA_EXTRA = "data";
+    private static final String TOTAL_TIME_EXTRA = "total time";
 
     private ImageView songCoverImage;
-    private Button playBtn;
+    private Button playBtn, nextBtn, previousBtn;
     private SeekBar positionSeekBar;
-    private TextView elapsedTimeLabel, totalTimeLabel;
-    private int totalTime;
+    private TextView elapsedTimeLabel, totalTimeLabel, songTitleTV, songArtistTV;
 
     private Handler mSeekBarUpdateHandler;
     private Runnable mUpdateSeekBar;
 
-    private Song song;
+    //    private Song song;
     private int currentPosition;
+    private String songTitle;
+    private String songData;
+    private String songArtist;
+    private int totalTime;
 
     public MusicPlayerFragment() {
+    }
+
+    public static Fragment newInstance(String title, String artist, String data, int duration) {
+        MusicPlayerFragment fragment = new MusicPlayerFragment();
+        Bundle args = new Bundle();
+        args.putString(TITLE_EXTRA, title);
+        args.putString(ARTIST_EXTRA, artist);
+        args.putString(DATA_EXTRA, data);
+        args.putInt(TOTAL_TIME_EXTRA, duration);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -55,22 +70,15 @@ public class MusicPlayerFragment extends Fragment {
         super.onStart();
     }
 
-    public static MusicPlayerFragment newInstance(Song song, int totalTime) {
-        MusicPlayerFragment fragment = new MusicPlayerFragment();
-        Bundle args = new Bundle();
-        args.putSerializable(ARG_PARAM1, song);
-        args.putInt(ARG_PARAM2, totalTime);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            song = (Song) getArguments().getSerializable(ARG_PARAM1);
-            totalTime = getArguments().getInt(ARG_PARAM2);
+            songTitle = getArguments().getString(TITLE_EXTRA);
+            songArtist = getArguments().getString(ARTIST_EXTRA);
+            songData = getArguments().getString(DATA_EXTRA);
+            totalTime = getArguments().getInt(TOTAL_TIME_EXTRA);
         }
     }
 
@@ -78,9 +86,9 @@ public class MusicPlayerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         View view = inflater.inflate(R.layout.fragment_music_player, container, false);
+
         initViews(view);
         getSongExtra();
-
         prepareAndListenToPositionSeekBarChanges();
         updateSeekBar();
         play();
@@ -88,18 +96,32 @@ public class MusicPlayerFragment extends Fragment {
         return view;
     }
 
-//    private void initMediaPlayer(String sUri) {
-//        Uri uri = Uri.parse(sUri);
-//        mp = MediaPlayer.create(this, uri);
-//        mp.setLooping(true);
-//        mp.seekTo(0);
-//        mp.setVolume(1.0f, 1.0f);
-//        totalTime = mp.getDuration();
+    private void initViews(View view) {
+        playBtn = view.findViewById(R.id.fragment_music_player_playBtn);
+        playBtn.setOnClickListener(this);
+        nextBtn = view.findViewById(R.id.fragment_music_player_next);
+        nextBtn.setOnClickListener(this);
+        previousBtn = view.findViewById(R.id.fragment_music_player_previous);
+        previousBtn.setOnClickListener(this);
 
-//        remainingTimeLabel.setText(createTimeLabel(totalTime));
-//
-//        prepareAndListenToPositionSeekBarChanges();
-//    }
+        songCoverImage = view.findViewById(R.id.fragment_music_player_song_img_cover);
+        elapsedTimeLabel = view.findViewById(R.id.fragment_music_player_elapsedTimeLabel);
+        totalTimeLabel = view.findViewById(R.id.fragment_music_player_totalTimeLabel);
+        positionSeekBar = view.findViewById(R.id.fragment_music_player_positionSeekBar);
+        songTitleTV = view.findViewById(R.id.fragment_music_player_song_title);
+        songArtistTV = view.findViewById(R.id.fragment_music_player_song_artist);
+        setTotalTimeLabel_TimeElapsed_SongTitleAndSongArtist();
+
+    }
+
+    private void setTotalTimeLabel_TimeElapsed_SongTitleAndSongArtist() {
+        totalTimeLabel.setText(createTimeLabel(totalTime));
+        elapsedTimeLabel.setText(createTimeLabel(((DisplaySongsActivity) getActivity()).getCurrentSongPosition()));
+        positionSeekBar.setMax(totalTime);
+        positionSeekBar.setProgress(currentPosition);
+        songTitleTV.setText(songTitle);
+        songArtistTV.setText(songArtist);
+    }
 
     private void prepareAndListenToPositionSeekBarChanges() {
         // position Bar
@@ -110,7 +132,7 @@ public class MusicPlayerFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     positionSeekBar.setProgress(progress);
-                    ((DisplaySongsActivity)getActivity()).setCurrentSongPosition(progress);
+                    ((DisplaySongsActivity) getActivity()).setCurrentSongPosition(progress);
                     elapsedTimeLabel.setText(createTimeLabel(progress));
                 }
             }
@@ -132,9 +154,9 @@ public class MusicPlayerFragment extends Fragment {
         mUpdateSeekBar = new Runnable() {
             @Override
             public void run() {
-                int currentPosition = ((DisplaySongsActivity) getActivity()).getCurrentSongPosition();
+                currentPosition = ((DisplaySongsActivity) getActivity()).getCurrentSongPosition();
                 positionSeekBar.setProgress(currentPosition);
-                Log.e("TAG", "run: "+ currentPosition );
+                Log.e("TAG", "run: " + currentPosition);
 //                ((DisplaySongsActivity)getActivity()).setCurrentSongPosition(progress);
                 mSeekBarUpdateHandler.postDelayed(this, 50);
 
@@ -145,30 +167,11 @@ public class MusicPlayerFragment extends Fragment {
         };
     }
 
-    private void initViews(View view) {
-        playBtn = view.findViewById(R.id.fragment_music_player_playBtn);
-        songCoverImage = view.findViewById(R.id.fragment_music_player_song_img_cover);
-        elapsedTimeLabel = view.findViewById(R.id.fragment_music_player_elapsedTimeLabel);
-        elapsedTimeLabel.setText(R.string.zero_start_time);
-        totalTimeLabel = view.findViewById(R.id.fragment_music_player_totalTimeLabel);
-        totalTimeLabel.setText(createTimeLabel(totalTime));
-
-        positionSeekBar = view.findViewById(R.id.fragment_music_player_positionSeekBar);
-        playBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((DisplaySongsActivity)getActivity()).playBtnClicked();
-                play();
-            }
-        });
-    }
-
     private void getSongExtra() {
-
         try {
-            String data = song.getData();
+//            String data = song.getData();
             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(data);
+            retriever.setDataSource(songData);
             byte[] coverBytes = retriever.getEmbeddedPicture();
             Bitmap songCover;
 
@@ -192,7 +195,7 @@ public class MusicPlayerFragment extends Fragment {
     }
 
     public void play() {
-        if (((DisplaySongsActivity)getActivity()).getIsPlaying()) {
+        if (((DisplaySongsActivity) getActivity()).getIsPlaying()) {
             // mediaPlayer is in pause state
             mSeekBarUpdateHandler.postDelayed(mUpdateSeekBar, 0);
             playBtn.setBackgroundResource(R.drawable.ic_pause);
@@ -200,6 +203,37 @@ public class MusicPlayerFragment extends Fragment {
             // mediaPlayer is in play state
             playBtn.setBackgroundResource(R.drawable.ic_play_button);
         }
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fragment_music_player_previous:
+                ((DisplaySongsActivity) getActivity()).previousBtnClicked();
+                play();
+                getSongChanged();
+                break;
+
+            case R.id.fragment_music_player_playBtn:
+                ((DisplaySongsActivity) getActivity()).playBtnClicked();
+                play();
+                break;
+
+            case R.id.fragment_music_player_next:
+                ((DisplaySongsActivity) getActivity()).nextBtnClicked();
+                play();
+                getSongChanged();
+        }
+    }
+
+    private void getSongChanged() {
+        songData = ((DisplaySongsActivity) getActivity()).getSongData();
+        songTitle = ((DisplaySongsActivity) getActivity()).getSongTitle();
+        songArtist = ((DisplaySongsActivity) getActivity()).getSongArtist();
+        totalTime = ((DisplaySongsActivity) getActivity()).getSongTotalTime();
+        getSongExtra();
+        setTotalTimeLabel_TimeElapsed_SongTitleAndSongArtist();
     }
 
 

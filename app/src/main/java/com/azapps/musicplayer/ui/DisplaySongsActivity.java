@@ -54,6 +54,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
     private MediaPlayer mp;
 
     // vars
+    private Song song;
     private int currentSongClickedPosition = -1;
 
     @Override
@@ -146,7 +147,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
     @Override
     public void onSongClick(int position) {
         currentSongClickedPosition = position;
-        Song song = detectFromWhichList(position);
+        song = detectFromWhichList(position);
         playMusic(song);
     }
 
@@ -286,7 +287,8 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         } else {
             currentSongClickedPosition++;
         }
-        playMusic(songList.get(currentSongClickedPosition));
+        song = songList.get(currentSongClickedPosition);
+        playMusic(song);
     }
 
     public void previousBtnClicked() {
@@ -295,14 +297,15 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         } else {
             currentSongClickedPosition--;
         }
-        playMusic(songList.get(currentSongClickedPosition));
+        song = songList.get(currentSongClickedPosition);
+        playMusic(song);
     }
 
     private void controlBodyClicked() {
         if (currentSongClickedPosition != -1) {
             Song song = detectFromWhichList(currentSongClickedPosition);
             ConstraintLayout constraintLayout = findViewById(R.id.activity_display_songs_root_constraint);
-            Utils.replaceFragments(MusicPlayerFragment.newInstance(song, mp.getDuration()), getSupportFragmentManager(), R.id.activity_display_songs_root_view);
+            Utils.replaceFragments(MusicPlayerFragment.newInstance(song.getTitle(), song.getArtist(), song.getData(), mp.getDuration()), getSupportFragmentManager(), R.id.activity_display_songs_root_view);
             constraintLayout.setVisibility(View.GONE);
 
         }
@@ -310,7 +313,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
 
 
     public void playBtnClicked() {
-        if (!mp.isPlaying()) {
+        if (!mp.isPlaying() && currentSongClickedPosition != -1) {
             mp.start();
             playBtn.setBackgroundResource(R.drawable.ic_pause);
         } else {
@@ -319,15 +322,32 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         }
     }
 
-    public int getCurrentSongPosition(){
+    public int getCurrentSongPosition() {
         return mp.getCurrentPosition();
     }
 
-    public void setCurrentSongPosition(int position){
+    public void setCurrentSongPosition(int position) {
         mp.seekTo(position);
     }
-    public boolean getIsPlaying(){
+
+    public boolean getIsPlaying() {
         return mp.isPlaying();
+    }
+
+    public String getSongData() {
+        return song.getData();
+    }
+
+    public String getSongTitle() {
+        return song.getTitle();
+    }
+
+    public String getSongArtist() {
+        return song.getArtist();
+    }
+
+    public int getSongTotalTime() {
+        return mp.getDuration();
     }
 
 
