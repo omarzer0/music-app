@@ -1,7 +1,6 @@
 package com.azapps.musicplayer.ui;
 
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,12 +31,11 @@ import com.azapps.musicplayer.R;
 import com.azapps.musicplayer.adapter.OnSongClickListener;
 import com.azapps.musicplayer.adapter.SongAdapter;
 import com.azapps.musicplayer.pojo.Song;
+import com.azapps.musicplayer.pojo.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.azapps.musicplayer.pojo.Constant.SEND_CLICKED_SONG_TO_MUSIC_ACTIVITY;
 
 public class DisplaySongsActivity extends AppCompatActivity implements OnSongClickListener, View.OnClickListener {
 
@@ -282,7 +280,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         }
     }
 
-    private void nextBtnClicked() {
+    public void nextBtnClicked() {
         if (currentSongClickedPosition >= songList.size() - 1) {
             currentSongClickedPosition = 0;
         } else {
@@ -291,7 +289,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         playMusic(songList.get(currentSongClickedPosition));
     }
 
-    private void previousBtnClicked() {
+    public void previousBtnClicked() {
         if (currentSongClickedPosition - 1 < 0) {
             currentSongClickedPosition = songList.size() - 1;
         } else {
@@ -302,17 +300,16 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
 
     private void controlBodyClicked() {
         if (currentSongClickedPosition != -1) {
-        Intent intent = new Intent(this, MusicPlayerActivity.class);
-        Song song = detectFromWhichList(currentSongClickedPosition);
-        intent.putExtra(SEND_CLICKED_SONG_TO_MUSIC_ACTIVITY, song);
-        startActivity(intent);
+            Song song = detectFromWhichList(currentSongClickedPosition);
+            ConstraintLayout constraintLayout = findViewById(R.id.activity_display_songs_root_constraint);
+            Utils.replaceFragments(MusicPlayerFragment.newInstance(song, mp.getDuration()), getSupportFragmentManager(), R.id.activity_display_songs_root_view);
+            constraintLayout.setVisibility(View.GONE);
+
         }
     }
 
 
-
-
-    private void playBtnClicked() {
+    public void playBtnClicked() {
         if (!mp.isPlaying()) {
             mp.start();
             playBtn.setBackgroundResource(R.drawable.ic_pause);
@@ -320,6 +317,17 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
             mp.pause();
             playBtn.setBackgroundResource(R.drawable.ic_play_button);
         }
+    }
+
+    public int getCurrentSongPosition(){
+        return mp.getCurrentPosition();
+    }
+
+    public void setCurrentSongPosition(int position){
+        mp.seekTo(position);
+    }
+    public boolean getIsPlaying(){
+        return mp.isPlaying();
     }
 
 
