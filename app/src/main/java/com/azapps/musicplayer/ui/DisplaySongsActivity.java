@@ -309,6 +309,9 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         }
     }
 
+
+
+
     private void playBtnClicked() {
         if (!mp.isPlaying()) {
             mp.start();
