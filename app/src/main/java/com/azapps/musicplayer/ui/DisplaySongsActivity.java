@@ -290,9 +290,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
     }
 
     private void playMusic(Song song) {
-        if (mp != null) {
-            mp.reset();
-        }
+        releaseMediaPlayer();
         String songData = song.getData();
         String songTitle = song.getTitle();
         setImageToPlayerControl(songData);
@@ -460,7 +458,6 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         MusicPlayerFragment fragment = (MusicPlayerFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
             playBtnClicked();
-//            mp.seekTo(0);
         } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
             playBtnClicked();
             releaseMediaPlayer();
