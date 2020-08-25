@@ -15,7 +15,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:scaleType="centerCrop"
-        tools:src="@drawable/song_not_found_background_image" />
+        tools:src="@drawable/default_image" />
 
     <TextView
         android:id="@+id/notification_collapsed_song_title_tv"

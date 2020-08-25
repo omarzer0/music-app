@@ -59,7 +59,7 @@ public class MusicNotification {
             collapsedView.setImageViewBitmap(R.id.notification_collapsed_song_image_image_view, songCover);
         } catch (Exception e) {
             e.getMessage();
-            collapsedView.setImageViewResource(R.id.notification_collapsed_song_image_image_view, R.drawable.song_not_found_background_image);
+            collapsedView.setImageViewResource(R.id.notification_collapsed_song_image_image_view, R.drawable.default_image);
         }
 
         collapsedView.setOnClickPendingIntent(R.id.notification_collapsed_previous_btn, actionIntentPrevious);
@@ -68,6 +68,7 @@ public class MusicNotification {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setCustomContentView(collapsedView)
+                .setCustomBigContentView(collapsedView)
                 .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
 
                 .setNotificationSilent()

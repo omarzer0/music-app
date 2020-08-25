@@ -113,7 +113,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     }
 
     private void setTotalTimeLabel_TimeElapsed_SongTitleAndSongArtist() {
-        currentPosition = ((DisplaySongsActivity)getActivity()).getCurrentSongPosition();
+        currentPosition = ((DisplaySongsActivity) getActivity()).getCurrentSongPosition();
         totalTimeLabel.setText(createTimeLabel(totalTime));
         elapsedTimeLabel.setText(createTimeLabel(((DisplaySongsActivity) getActivity()).getCurrentSongPosition()));
         positionSeekBar.setMax(totalTime);
@@ -175,7 +175,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
             songCoverImage.setImageBitmap(songCover);
         } catch (Exception e) {
             e.getMessage();
-            songCoverImage.setImageResource(R.drawable.song_not_found_background_image);
+            songCoverImage.setImageResource(R.drawable.default_image);
         }
     }
 
@@ -201,13 +201,24 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         }
     }
 
+    public void reversePlay() {
+        if (((DisplaySongsActivity) getActivity()).getIsPlaying()) {
+            // mediaPlayer is in pause state
+            mSeekBarUpdateHandler.postDelayed(mUpdateSeekBar, 0);
+            playBtn.setBackgroundResource(R.drawable.ic_play_button);
+        } else {
+            // mediaPlayer is in play state
+            playBtn.setBackgroundResource(R.drawable.ic_pause);
+        }
+    }
+
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fragment_music_player_previous:
                 ((DisplaySongsActivity) getActivity()).previousBtnClicked();
-                play();
+                reversePlay();
                 getSongChanged();
                 break;
 
@@ -218,23 +229,11 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
 
             case R.id.fragment_music_player_next:
                 ((DisplaySongsActivity) getActivity()).nextBtnClicked();
-                play();
+                reversePlay();
                 getSongChanged();
         }
     }
 
-//    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            String action = intent.getExtras().getString(ACTION_NAME);
-//            switch (action) {
-//                case ACTION_PLAY:
-//                    play();
-//                    break;
-//
-//            }
-//        }
-//    };
 
     private IntentFilter filter = new IntentFilter(MUSIC_BROADCAST_SEND_INTENT);
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -246,7 +245,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
 
                 case ACTION_PREVIOUS:
                     ((DisplaySongsActivity) getActivity()).previousBtnClicked();
-                    play();
+                    reversePlay();
                     getSongChanged();
                     break;
 
@@ -257,7 +256,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
 
                 case ACTION_NEXT:
                     ((DisplaySongsActivity) getActivity()).nextBtnClicked();
-                    play();
+                    reversePlay();
                     getSongChanged();
                     break;
 

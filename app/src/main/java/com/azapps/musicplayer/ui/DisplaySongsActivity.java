@@ -252,7 +252,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
             nowPlayingImageView.setImageBitmap(songCover);
         } catch (Exception e) {
             e.getMessage();
-            nowPlayingImageView.setImageResource(R.drawable.song_not_found_background_image);
+            nowPlayingImageView.setImageResource(R.drawable.default_image);
         }
     }
 
@@ -310,28 +310,32 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
 
 
     public void nextBtnClicked() {
-        startMyService();
-        if (currentSongClickedPosition >= songList.size() - 1) {
-            currentSongClickedPosition = 0;
-        } else {
-            currentSongClickedPosition++;
-        }
-        song = songList.get(currentSongClickedPosition);
-        if (checkOnAudioFocus()) {
-            playMusic(song);
+        if (mp != null) {
+            startMyService();
+            if (currentSongClickedPosition >= songList.size() - 1) {
+                currentSongClickedPosition = 0;
+            } else {
+                currentSongClickedPosition++;
+            }
+            song = songList.get(currentSongClickedPosition);
+            if (checkOnAudioFocus()) {
+                playMusic(song);
+            }
         }
     }
 
     public void previousBtnClicked() {
-        startMyService();
-        if (currentSongClickedPosition - 1 < 0) {
-            currentSongClickedPosition = songList.size() - 1;
-        } else {
-            currentSongClickedPosition--;
-        }
-        song = songList.get(currentSongClickedPosition);
-        if (checkOnAudioFocus()) {
-            playMusic(song);
+        if (mp != null) {
+            startMyService();
+            if (currentSongClickedPosition - 1 < 0) {
+                currentSongClickedPosition = songList.size() - 1;
+            } else {
+                currentSongClickedPosition--;
+            }
+            song = songList.get(currentSongClickedPosition);
+            if (checkOnAudioFocus()) {
+                playMusic(song);
+            }
         }
     }
 
