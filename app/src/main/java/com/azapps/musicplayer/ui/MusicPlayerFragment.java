@@ -113,6 +113,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     }
 
     private void setTotalTimeLabel_TimeElapsed_SongTitleAndSongArtist() {
+        currentPosition = ((DisplaySongsActivity)getActivity()).getCurrentSongPosition();
         totalTimeLabel.setText(createTimeLabel(totalTime));
         elapsedTimeLabel.setText(createTimeLabel(((DisplaySongsActivity) getActivity()).getCurrentSongPosition()));
         positionSeekBar.setMax(totalTime);
