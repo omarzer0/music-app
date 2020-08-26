@@ -1,4 +1,4 @@
-package com.azapps.musicplayer.ui;
+package com.azapps.musicplayer.ui.activity;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -25,7 +25,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -41,6 +40,8 @@ import com.azapps.musicplayer.adapter.SongAdapter;
 import com.azapps.musicplayer.pojo.Song;
 import com.azapps.musicplayer.pojo.Utils;
 import com.azapps.musicplayer.service.MusicService;
+import com.azapps.musicplayer.ui.fragment.MoreBottomSheetDialog;
+import com.azapps.musicplayer.ui.fragment.MusicPlayerFragment;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,7 +51,10 @@ import static com.azapps.musicplayer.pojo.Constant.ACTION_NAME;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NEXT;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PLAY;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PREVIOUS;
+import static com.azapps.musicplayer.pojo.Constant.ADDED_TIME_ORDER;
+import static com.azapps.musicplayer.pojo.Constant.ALPHA_ORDER;
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_TAG;
+import static com.azapps.musicplayer.pojo.Constant.MORE_BOTTOM_SHEET_TAG;
 import static com.azapps.musicplayer.pojo.Constant.MUSIC_BROADCAST_SEND_INTENT;
 import static com.azapps.musicplayer.pojo.Constant.SEND_IS_PLAYING_BOOLEAN_EXTRA;
 import static com.azapps.musicplayer.pojo.Constant.SEND_SONG_DATA_STRING_EXTRA;
@@ -59,13 +63,14 @@ import static com.azapps.musicplayer.pojo.Constant.SEND_SONG_TITLE_STRING_EXTRA;
 public class DisplaySongsActivity extends AppCompatActivity implements OnSongClickListener, View.OnClickListener,
         OnAudioFocusChangeListener, OnPreparedListener, OnCompletionListener {
 
+    private static final String TAG = "DisplaySongsActivity";
     // ui
     private ArrayList<Song> songList;
     private ArrayList<Song> filteredArrayList;
     private SongAdapter adapter;
     private SongViewModel songViewModel;
 
-    private Button previousBtn, playBtn, nextBtn;
+    private Button previousBtn, playBtn, nextBtn, moreOptionsBtn;
     private EditText searchEditText;
     private ImageView nowPlayingImageView;
     private TextView nowPlayingTextView;
@@ -77,6 +82,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
     private Song song;
     private int currentSongClickedPosition = -1;
     private boolean isLooping = false;
+    private static int orderOfAudioFiles = ADDED_TIME_ORDER;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +90,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         setContentView(R.layout.activity_display_songs);
 
         initViews();
-        prepareMoreOptionImg();
+//        prepareMoreOptionImg();
         setRecyclerView();
         modelViewInstantiate();
         initEditTextSearchFunction();
@@ -94,6 +100,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         previousBtn = findViewById(R.id.activity_display_songs_previous_btn);
         playBtn = findViewById(R.id.activity_display_songs_play_btn);
         nextBtn = findViewById(R.id.activity_display_songs_next_btn);
+        moreOptionsBtn = findViewById(R.id.activity_display_songs_btn_more_options);
         searchEditText = findViewById(R.id.activity_display_songs_ed_search_edit_text);
         nowPlayingImageView = findViewById(R.id.activity_display_songs_now_playing_song_image_view);
         nowPlayingTextView = findViewById(R.id.activity_display_songs_now_playing_song_title);
@@ -108,23 +115,40 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         playBtn.setOnClickListener(this);
         nextBtn.setOnClickListener(this);
         bottomControlConstraintLayout.setOnClickListener(this);
+        moreOptionsBtn.setOnClickListener(this);
     }
 
     private void modelViewInstantiate() {
         songViewModel = new ViewModelProvider(this,
                 ViewModelProvider.AndroidViewModelFactory.getInstance(this.getApplication()))
                 .get(SongViewModel.class);
-        LiveData<List<Song>> listLiveDataSongs = songViewModel.getAllSongs();
+        LiveData<List<Song>> listLiveDataSongs = null;
+        if (orderOfAudioFiles == ADDED_TIME_ORDER) {
+            songViewModel.viewModelOrder = ADDED_TIME_ORDER;
+            listLiveDataSongs = songViewModel.getAllSongsByAddedOrder();
+            Log.e(TAG, "modelViewInstantiate: " + 1);
+        } else if (orderOfAudioFiles == ALPHA_ORDER) {
+            songViewModel.viewModelOrder = ALPHA_ORDER;
+            listLiveDataSongs = songViewModel.getAllSongsByAlphaOrder();
+            Log.e(TAG, "modelViewInstantiate: " + 2);
+        }
+
         // switch on order by function
-        listLiveDataSongs.observe(this, new Observer<List<Song>>() {
-            @Override
-            public void onChanged(List<Song> songs) {
-                songList = new ArrayList<>();
-                songList.addAll(songs);
-                adapter.submitList(songs);
-            }
-        });
+        if (songListObserver != null) {
+            listLiveDataSongs.removeObserver(songListObserver);
+        }
+        listLiveDataSongs.observe(this, songListObserver);
     }
+
+    private Observer<List<Song>> songListObserver = new Observer<List<Song>>() {
+        @Override
+        public void onChanged(List<Song> songs) {
+            songList = new ArrayList<>();
+            songList.addAll(songs);
+            adapter.submitList(songs);
+            Log.e(TAG, "onChanged: " + orderOfAudioFiles);
+        }
+    };
 
     private void getMusic() {
         ContentResolver contentResolver = getContentResolver();
@@ -182,23 +206,23 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         return song;
     }
 
-    private void prepareMoreOptionImg() {
-        Button moreOptionsImg = findViewById(R.id.activity_display_songs_img_more_options);
-        moreOptionsImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                freeDateBase();
-                try {
-                    getMusic();
-                    if (songList.size() == 0)
-                        Toast.makeText(DisplaySongsActivity.this, "oooops! no music was found", Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
-                    Log.e("error", "onCreate: " + e.getMessage());
-                    Toast.makeText(DisplaySongsActivity.this, "Error can't load any song", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
+//    private void prepareMoreOptionImg() {
+//        Button moreOptionsImg = findViewById(R.id.activity_display_songs_img_more_options);
+//        moreOptionsImg.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                freeDateBase();
+//                try {
+//                    getMusic();
+//                    if (songList.size() == 0)
+//                        Toast.makeText(DisplaySongsActivity.this, "oooops! no music was found", Toast.LENGTH_SHORT).show();
+//                } catch (Exception e) {
+//                    Log.e("error", "onCreate: " + e.getMessage());
+//                    Toast.makeText(DisplaySongsActivity.this, "Error can't load any song", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//    }
 
     private void freeDateBase() {
         try {
@@ -275,7 +299,15 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
             case R.id.activity_display_songs_constraint_layout_bottom_play_control:
                 controlBodyClicked();
                 break;
+            case R.id.activity_display_songs_btn_more_options:
+                moreOptionsBtnClicked();
+                break;
         }
+    }
+
+    private void moreOptionsBtnClicked() {
+        MoreBottomSheetDialog moreBottomSheetDialog = new MoreBottomSheetDialog();
+        moreBottomSheetDialog.show(getSupportFragmentManager(), MORE_BOTTOM_SHEET_TAG);
     }
 
     private void initMediaPlayer() {
@@ -400,6 +432,16 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         return mp.getDuration();
     }
 
+    public int getOrderOfAudioFiles() {
+        return orderOfAudioFiles;
+    }
+
+    public void setOrderOfAudioFiles(int order) {
+        orderOfAudioFiles = order;
+        modelViewInstantiate();
+    }
+
+
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -484,4 +526,5 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         initMediaPlayer();
         nextBtnClicked();
     }
+
 }

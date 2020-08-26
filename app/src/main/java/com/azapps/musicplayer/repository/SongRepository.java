@@ -18,7 +18,7 @@ public class SongRepository {
     public SongRepository(Application application) {
         SongDatabase songDatabase = SongDatabase.getInstance(application);
         songDao = songDatabase.songDao();
-        allSongs = songDao.getAllSongsByTitle();
+//        allSongs = songDao.getAllSongsByTitle();
     }
 
 
@@ -39,7 +39,17 @@ public class SongRepository {
     }
 
 
-    public LiveData<List<Song>> getAllSongs() {
+//    public LiveData<List<Song>> getAllSongs() {
+//        return allSongs;
+//    }
+
+    public LiveData<List<Song>> getAllSongsByAddedOrder() {
+        allSongs = songDao.getAllSongsByLastModifyDate();
+        return allSongs;
+    }
+
+    public LiveData<List<Song>> getAllSongsByAlphaOrder() {
+        allSongs = songDao.getAllSongsByTitle();
         return allSongs;
     }
 

@@ -14,4 +14,7 @@ public class Constant {
     public static final String SEND_SONG_TITLE_STRING_EXTRA = "SEND_SONG_TITLE_STRING_EXTRA";
     public static final String SEND_SONG_DATA_STRING_EXTRA = "SEND_SONG_DATA_STRING_EXTRA";
     public static final String FRAGMENT_TAG = "fragment tag";
+    public static final String MORE_BOTTOM_SHEET_TAG = "more bottom sheet tag";
+    public static final int ADDED_TIME_ORDER = 1;
+    public static final int ALPHA_ORDER = 2;
 }

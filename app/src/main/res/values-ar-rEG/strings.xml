@@ -3,4 +3,10 @@
     <string name="app_name">Music Player</string>
     <string name="search_for_songs"><font size="14">ابحث عن الموسيقي</font></string>
     <string name="choose_a_song">اختر موسيقى</string>
+    <string name="sort_by">تصنيف حسب</string>
+    <string name="load_local_audio_files">فحص الملفات الصوتية المحلية</string>
+    <string name="cancel">إلغاء</string>
+    <string name="choose_sorting_order">اختر طريقة التصنيف</string>
+    <string name="sort_by_alphabetical_order">تصنيف حسب الترتيب الابجدي</string>
+    <string name="sort_by_added_time">تصنيف حسب وقت الاضافة</string>
 </resources>

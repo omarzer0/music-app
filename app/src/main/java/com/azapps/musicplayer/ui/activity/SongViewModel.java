@@ -1,4 +1,4 @@
-package com.azapps.musicplayer.ui;
+package com.azapps.musicplayer.ui.activity;
 
 import android.app.Application;
 
@@ -14,12 +14,18 @@ import java.util.List;
 public class SongViewModel extends AndroidViewModel {
     private SongRepository repository;
     private LiveData<List<Song>> allSongs;
-
+    public int viewModelOrder;
 
     public SongViewModel(@NonNull Application application) {
         super(application);
         repository = new SongRepository(application);
-        allSongs = repository.getAllSongs();
+//        if (viewModelOrder == ADDED_TIME_ORDER) {
+//            allSongs = repository.getAllSongsByAddedOrder();
+//        }else if (viewModelOrder == ALPHA_ORDER){
+//            allSongs = repository.getAllSongsByAlphaOrder();
+//        }
+
+//        allSongs = repository.getAllSongs();
     }
 
     public void insert(Song song) {
@@ -38,7 +44,16 @@ public class SongViewModel extends AndroidViewModel {
         repository.deleteAllSongs();
     }
 
-    public LiveData<List<Song>> getAllSongs() {
-        return allSongs;
+    //    public LiveData<List<Song>> getAllSongs() {
+//        return allSongs;
+//    }
+    public LiveData<List<Song>> getAllSongsByAddedOrder() {
+        allSongs = repository.getAllSongsByAddedOrder();
+        return repository.getAllSongsByAddedOrder();
+    }
+
+    public LiveData<List<Song>> getAllSongsByAlphaOrder() {
+        allSongs = repository.getAllSongsByAlphaOrder();
+        return repository.getAllSongsByAlphaOrder();
     }
 }

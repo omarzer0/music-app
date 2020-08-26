@@ -5,7 +5,7 @@
     android:id="@+id/activity_display_songs_root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.DisplaySongsActivity">
+    tools:context=".ui.activity.DisplaySongsActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/activity_display_songs_root_constraint"
@@ -23,7 +23,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:background="#fff"
-            android:paddingBottom="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -44,12 +43,12 @@
                 android:textColorHint="@android:color/tertiary_text_light"
                 android:textSize="16sp"
                 app:drawableStartCompat="@drawable/ic_search"
-                app:layout_constraintEnd_toStartOf="@+id/activity_display_songs_img_more_options"
+                app:layout_constraintEnd_toStartOf="@+id/activity_display_songs_btn_more_options"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
-                android:id="@+id/activity_display_songs_img_more_options"
+                android:id="@+id/activity_display_songs_btn_more_options"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginEnd="22dp"
@@ -58,6 +57,15 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/activity_display_songs_ed_search_edit_text" />
 
+            <View
+                android:layout_width="0dp"
+                android:layout_height="3dp"
+                android:background="#2CAAAAAA"
+                android:layout_marginTop="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/activity_display_songs_btn_more_options"
+                app:layout_constraintStart_toStartOf="@+id/activity_display_songs_ed_search_edit_text"
+                app:layout_constraintTop_toBottomOf="@+id/activity_display_songs_ed_search_edit_text" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView

@@ -26,8 +26,8 @@ public interface SongDao {
     @Query("DELETE FROM song_table")
     void deleteAllSongs();
 
-//    @Query("SELECT * FROM song_table ORDER BY lastModifyDate DESC")
-//    LiveData<List<Song>> getAllSongsByLastModifyDate();
+    @Query("SELECT * FROM song_table ORDER BY lastModifyDate DESC")
+    LiveData<List<Song>> getAllSongsByLastModifyDate();
 
     @Query("SELECT * FROM song_table ORDER BY title DESC")
     LiveData<List<Song>> getAllSongsByTitle();

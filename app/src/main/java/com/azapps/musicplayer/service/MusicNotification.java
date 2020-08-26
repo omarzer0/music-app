@@ -13,7 +13,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.azapps.musicplayer.R;
 import com.azapps.musicplayer.broadcast.MusicBroadcast;
-import com.azapps.musicplayer.ui.DisplaySongsActivity;
+import com.azapps.musicplayer.ui.activity.DisplaySongsActivity;
 
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NEXT;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PLAY;

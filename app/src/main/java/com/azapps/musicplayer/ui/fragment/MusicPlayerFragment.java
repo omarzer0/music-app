@@ -1,4 +1,4 @@
-package com.azapps.musicplayer.ui;
+package com.azapps.musicplayer.ui.fragment;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,6 +23,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.azapps.musicplayer.R;
+import com.azapps.musicplayer.ui.activity.DisplaySongsActivity;
 
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NAME;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NEXT;
