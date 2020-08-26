@@ -9,4 +9,12 @@
     <string name="choose_sorting_order">اختر طريقة التصنيف</string>
     <string name="sort_by_alphabetical_order">تصنيف حسب الترتيب الابجدي</string>
     <string name="sort_by_added_time">تصنيف حسب وقت الاضافة</string>
+    <string name="no_audio_was_found">لم يتم العثور علي اي ملف صوتي</string>
+    <string name="click_here_to_search_your_local_storage">اضغط للبحث عن الملفات الصوتية المحلية</string>
+    <string name="search_again">ابحث مجددا</string>
+    <string name="noOfSongsFound">" ملف صوتي تم العثور عليه"</string>
+    <string name="required_permission">اذن وصول مطلوب</string>
+    <string name="storage_permission_alert_message">هذا الاذن مطلوب لتحميل الملفات الصوتية من الهاتف</string>
+    <string name="ok">تم</string>
+    <string name="music_player">مشغل الصوتيات</string>
 </resources>

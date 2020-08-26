@@ -77,8 +77,8 @@ public class MusicNotification {
 
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setContentTitle("Music Service")
-                .setSmallIcon(R.drawable.ic_launcher_background)
-                .setContentIntent(pendingIntent);
+                .setSmallIcon(R.drawable.ic_launcher_background);
+//                .setContentIntent(pendingIntent);
 
         return builder;
     }

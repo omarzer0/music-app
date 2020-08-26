@@ -272,7 +272,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         getActivity().registerReceiver(broadcastReceiver, filter);
     }
 
-    private void getSongChanged() {
+    public void getSongChanged() {
         songData = ((DisplaySongsActivity) getActivity()).getSongData();
         songTitle = ((DisplaySongsActivity) getActivity()).getSongTitle();
         songArtist = ((DisplaySongsActivity) getActivity()).getSongArtist();
@@ -287,7 +287,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         getActivity().unregisterReceiver(broadcastReceiver);
         getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         mSeekBarUpdateHandler.removeCallbacks(mUpdateSeekBar);
-        ConstraintLayout constraintLayout = getActivity().findViewById(R.id.activity_display_songs_root_constraint);
+        ConstraintLayout constraintLayout = getActivity().findViewById(R.id.activity_display_songs_root_constraint_found);
         constraintLayout.setVisibility(View.VISIBLE);
     }
 }

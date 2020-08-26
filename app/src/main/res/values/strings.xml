@@ -11,4 +11,12 @@
     <string name="choose_sorting_order">Choose sorting order</string>
     <string name="sort_by_alphabetical_order">Sort by alphabetical order</string>
     <string name="sort_by_added_time">Sort by added time</string>
+    <string name="no_audio_was_found">No audio was found</string>
+    <string name="click_here_to_search_your_local_storage">Click here to search your local storage</string>
+    <string name="search_again">Search again</string>
+    <string name="noOfSongsFound">" Songs was found"</string>
+    <string name="required_permission">Required Permission</string>
+    <string name="storage_permission_alert_message">This permission is essential for loading audio files from your device</string>
+    <string name="ok">Ok</string>
+    <string name="music_player">Music Player</string>
 </resources>

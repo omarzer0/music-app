@@ -1,10 +1,14 @@
 package com.azapps.musicplayer.ui.activity;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,8 +30,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -42,6 +49,7 @@ import com.azapps.musicplayer.pojo.Utils;
 import com.azapps.musicplayer.service.MusicService;
 import com.azapps.musicplayer.ui.fragment.MoreBottomSheetDialog;
 import com.azapps.musicplayer.ui.fragment.MusicPlayerFragment;
+import com.azapps.musicplayer.ui.fragment.SearchLocalStorageFragment;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,15 +61,17 @@ import static com.azapps.musicplayer.pojo.Constant.ACTION_PLAY;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PREVIOUS;
 import static com.azapps.musicplayer.pojo.Constant.ADDED_TIME_ORDER;
 import static com.azapps.musicplayer.pojo.Constant.ALPHA_ORDER;
-import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_TAG;
+import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_MUSIC_PLAYER_TAG;
+import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_SEARCH_LOCAL_STORAGE_TAG;
 import static com.azapps.musicplayer.pojo.Constant.MORE_BOTTOM_SHEET_TAG;
 import static com.azapps.musicplayer.pojo.Constant.MUSIC_BROADCAST_SEND_INTENT;
+import static com.azapps.musicplayer.pojo.Constant.REQUEST_PERMISSION_STORAGE;
 import static com.azapps.musicplayer.pojo.Constant.SEND_IS_PLAYING_BOOLEAN_EXTRA;
 import static com.azapps.musicplayer.pojo.Constant.SEND_SONG_DATA_STRING_EXTRA;
 import static com.azapps.musicplayer.pojo.Constant.SEND_SONG_TITLE_STRING_EXTRA;
 
 public class DisplaySongsActivity extends AppCompatActivity implements OnSongClickListener, View.OnClickListener,
-        OnAudioFocusChangeListener, OnPreparedListener, OnCompletionListener {
+        OnAudioFocusChangeListener, OnPreparedListener, OnCompletionListener, DialogInterface.OnClickListener {
 
     private static final String TAG = "DisplaySongsActivity";
     // ui
@@ -73,7 +83,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
     private Button previousBtn, playBtn, nextBtn, moreOptionsBtn;
     private EditText searchEditText;
     private ImageView nowPlayingImageView;
-    private TextView nowPlayingTextView;
+    private TextView nowPlayingTextView, clickToLoadDataTv;
     private ConstraintLayout bottomControlConstraintLayout;
     private MediaPlayer mp;
     private AudioManager audioManager;
@@ -92,8 +102,8 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         initViews();
 //        prepareMoreOptionImg();
         setRecyclerView();
-        modelViewInstantiate();
-        initEditTextSearchFunction();
+        checkIfThePermissionIsGranted();
+
     }
 
     private void initViews() {
@@ -105,7 +115,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         nowPlayingImageView = findViewById(R.id.activity_display_songs_now_playing_song_image_view);
         nowPlayingTextView = findViewById(R.id.activity_display_songs_now_playing_song_title);
         bottomControlConstraintLayout = findViewById(R.id.activity_display_songs_constraint_layout_bottom_play_control);
-
+        clickToLoadDataTv = findViewById(R.id.activity_display_songs_search_local_db_tv);
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         setListeners();
     }
@@ -116,7 +126,72 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         nextBtn.setOnClickListener(this);
         bottomControlConstraintLayout.setOnClickListener(this);
         moreOptionsBtn.setOnClickListener(this);
+        clickToLoadDataTv.setOnClickListener(this);
     }
+
+    private void checkIfThePermissionIsGranted() {
+        if (ContextCompat.checkSelfPermission(DisplaySongsActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // not granted show explanation for the required permission
+            if (ActivityCompat.shouldShowRequestPermissionRationale(DisplaySongsActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                alertMessageBuilder();
+            } else {
+                //request it again
+                ActivityCompat.requestPermissions(DisplaySongsActivity.this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_STORAGE);
+            }
+
+        } else {
+            // granted
+            modelViewInstantiate();
+            initEditTextSearchFunction();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_PERMISSION_STORAGE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                modelViewInstantiate();
+                initEditTextSearchFunction();
+            } else {
+                finishAffinity();
+            }
+        }
+    }
+
+    private void alertMessageBuilder() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(DisplaySongsActivity.this);
+        builder.setTitle(R.string.required_permission)
+                .setMessage(R.string.storage_permission_alert_message)
+                .setCancelable(false)
+                .setPositiveButton(R.string.ok, this)
+                .show();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        ActivityCompat.requestPermissions(DisplaySongsActivity.this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                REQUEST_PERMISSION_STORAGE);
+    }
+
+    public void loadAudioFromTheDevice() {
+        modelViewInstantiate();
+        freeDateBase();
+        getMusic();
+    }
+
+    private void audioFilesWasFound() {
+        if (songList.size() > 0) {
+            Log.e(TAG, "audioFilesWasFound: full");
+            ConstraintLayout constraintLayoutFound = findViewById(R.id.activity_display_songs_root_constraint_found);
+            constraintLayoutFound.setVisibility(View.VISIBLE);
+            ConstraintLayout constraintLayoutNotFound = findViewById(R.id.activity_display_songs_root_not_found);
+            constraintLayoutNotFound.setVisibility(View.GONE);
+        }
+    }
+
 
     private void modelViewInstantiate() {
         songViewModel = new ViewModelProvider(this,
@@ -146,7 +221,14 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
             songList = new ArrayList<>();
             songList.addAll(songs);
             adapter.submitList(songs);
-            Log.e(TAG, "onChanged: " + orderOfAudioFiles);
+
+            SearchLocalStorageFragment fragment = (SearchLocalStorageFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_SEARCH_LOCAL_STORAGE_TAG);
+            if ((fragment != null && fragment.isVisible())) {
+                fragment.getDataToTextView(songList.size());
+                Log.e(TAG, "onChanged: " + songList.size());
+            } else {
+                audioFilesWasFound();
+            }
         }
     };
 
@@ -161,11 +243,12 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
             while (cursor.moveToNext()) {
                 String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                 String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                long lastDateModified = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED));
+
                 String displayName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
                 String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
-                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                 String year = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.YEAR));
-                long lastDateModified = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED));
                 long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
                 // Save to audioList
                 Song song = new Song(title, displayName, artist, album, data, year, lastDateModified, size);
@@ -302,6 +385,12 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
             case R.id.activity_display_songs_btn_more_options:
                 moreOptionsBtnClicked();
                 break;
+            case R.id.activity_display_songs_search_local_db_tv:
+//                ConstraintLayout constraintLayoutFound = findViewById(R.id.activity_display_songs_root_constraint_found);
+                ConstraintLayout constraintLayoutNotFound = findViewById(R.id.activity_display_songs_root_not_found);
+                constraintLayoutNotFound.setVisibility(View.GONE);
+                Utils.replaceFragments(SearchLocalStorageFragment.newInstance(), getSupportFragmentManager(), R.id.activity_display_songs_root_view, FRAGMENT_SEARCH_LOCAL_STORAGE_TAG);
+                break;
         }
     }
 
@@ -372,8 +461,10 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
     private void controlBodyClicked() {
         if (currentSongClickedPosition != -1) {
             Song song = detectFromWhichList(currentSongClickedPosition);
-            ConstraintLayout constraintLayout = findViewById(R.id.activity_display_songs_root_constraint);
-            Utils.replaceFragments(MusicPlayerFragment.newInstance(song.getTitle(), song.getArtist(), song.getData(), mp.getDuration()), getSupportFragmentManager(), R.id.activity_display_songs_root_view);
+            ConstraintLayout constraintLayout = findViewById(R.id.activity_display_songs_root_constraint_found);
+            Utils.replaceFragments(MusicPlayerFragment.newInstance(song.getTitle(),
+                    song.getArtist(), song.getData(), mp.getDuration()),
+                    getSupportFragmentManager(), R.id.activity_display_songs_root_view, FRAGMENT_MUSIC_PLAYER_TAG);
             constraintLayout.setVisibility(View.GONE);
 
         }
@@ -446,7 +537,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getExtras().getString(ACTION_NAME);
-            MusicPlayerFragment fragment = (MusicPlayerFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+            MusicPlayerFragment fragment = (MusicPlayerFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_MUSIC_PLAYER_TAG);
             if (!(fragment != null && fragment.isVisible()))
                 switch (action) {
                     case ACTION_PREVIOUS:
@@ -497,7 +588,7 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
 
     @Override
     public void onAudioFocusChange(int focusChange) {
-        MusicPlayerFragment fragment = (MusicPlayerFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        MusicPlayerFragment fragment = (MusicPlayerFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_MUSIC_PLAYER_TAG);
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
             playBtnClicked();
         } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
@@ -525,6 +616,11 @@ public class DisplaySongsActivity extends AppCompatActivity implements OnSongCli
         releaseMediaPlayer();
         initMediaPlayer();
         nextBtnClicked();
+        MusicPlayerFragment fragment = (MusicPlayerFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_MUSIC_PLAYER_TAG);
+        if ((fragment != null && fragment.isVisible())) {
+            fragment.getSongChanged();
+        }
     }
+
 
 }

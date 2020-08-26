@@ -13,8 +13,11 @@ public class Constant {
     public static final String SEND_IS_PLAYING_BOOLEAN_EXTRA = "SEND_IS_PLAYING_BOOLEAN_EXTRA";
     public static final String SEND_SONG_TITLE_STRING_EXTRA = "SEND_SONG_TITLE_STRING_EXTRA";
     public static final String SEND_SONG_DATA_STRING_EXTRA = "SEND_SONG_DATA_STRING_EXTRA";
-    public static final String FRAGMENT_TAG = "fragment tag";
+    public static final String FRAGMENT_MUSIC_PLAYER_TAG = "music player fragment tag";
+    public static final String FRAGMENT_SORT_ORDER_TAG = "order fragment tag";
+    public static final String FRAGMENT_SEARCH_LOCAL_STORAGE_TAG = "search local storage fragment tag";
     public static final String MORE_BOTTOM_SHEET_TAG = "more bottom sheet tag";
     public static final int ADDED_TIME_ORDER = 1;
     public static final int ALPHA_ORDER = 2;
+    public static final int REQUEST_PERMISSION_STORAGE = 1000;
 }

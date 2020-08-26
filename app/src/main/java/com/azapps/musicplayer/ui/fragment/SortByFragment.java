@@ -45,7 +45,7 @@ public class SortByFragment extends Fragment implements RadioGroup.OnCheckedChan
     @Override
     public void onDetach() {
         super.onDetach();
-        ConstraintLayout constraintLayout = getActivity().findViewById(R.id.activity_display_songs_root_constraint);
+        ConstraintLayout constraintLayout = getActivity().findViewById(R.id.activity_display_songs_root_constraint_found);
         constraintLayout.setVisibility(View.VISIBLE);
     }
 

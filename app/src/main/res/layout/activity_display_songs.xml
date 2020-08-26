@@ -8,13 +8,52 @@
     tools:context=".ui.activity.DisplaySongsActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/activity_display_songs_root_constraint"
+        android:id="@+id/activity_display_songs_root_not_found"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:drawablePadding="8dp"
+            android:text="@string/no_audio_was_found"
+            android:textColor="#000"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:drawableStartCompat="@drawable/ic_sad"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/activity_display_songs_search_local_db_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/click_here_to_search_your_local_storage"
+            android:textColor="#F43636"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/textView2"
+            app:layout_constraintStart_toStartOf="@+id/textView2"
+            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/activity_display_songs_root_constraint_found"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#fff"
         android:clickable="true"
         android:focusable="true"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        android:visibility="gone">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -60,8 +99,8 @@
             <View
                 android:layout_width="0dp"
                 android:layout_height="3dp"
-                android:background="#2CAAAAAA"
                 android:layout_marginTop="8dp"
+                android:background="#2CAAAAAA"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/activity_display_songs_btn_more_options"
                 app:layout_constraintStart_toStartOf="@+id/activity_display_songs_ed_search_edit_text"
@@ -104,6 +143,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
+                android:background="#88AAAAAA"
                 android:scaleType="centerCrop"
                 android:src="@drawable/default_image"
                 app:layout_constraintBottom_toBottomOf="parent"
