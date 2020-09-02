@@ -107,6 +107,7 @@ public class Test extends Fragment implements OnSongClickListener, View.OnClickL
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_display_songs, container, false);
         initViews(view);
+        constraintLayoutFound.setVisibility(View.VISIBLE);
 //        prepareMoreOptionImg();
         setRecyclerView(view);
         checkIfThePermissionIsGranted();
@@ -470,10 +471,9 @@ public class Test extends Fragment implements OnSongClickListener, View.OnClickL
         if (currentSongClickedPosition != -1) {
             Song song = detectFromWhichList(currentSongClickedPosition);
 
-
             Utils.replaceFragments(MusicPlayerFragment.newInstance(song.getTitle(),
                     song.getArtist(), song.getData(), mp.getDuration()),
-                    getChildFragmentManager(), R.id.activity_display_songs_root_view, FRAGMENT_MUSIC_PLAYER_TAG);
+                    getFragmentManager(), R.id.activity_display_songs_root_view, FRAGMENT_MUSIC_PLAYER_TAG);
             constraintLayoutFound.setVisibility(View.GONE);
 
         }
@@ -612,7 +612,7 @@ public class Test extends Fragment implements OnSongClickListener, View.OnClickL
             playBtnClicked();
         }
         if (fragment != null && fragment.isVisible()) {
-            fragment.play();
+//            fragment.play();
         }
     }
 
@@ -630,7 +630,7 @@ public class Test extends Fragment implements OnSongClickListener, View.OnClickL
         nextBtnClicked();
         MusicPlayerFragment fragment = (MusicPlayerFragment) getChildFragmentManager().findFragmentByTag(FRAGMENT_MUSIC_PLAYER_TAG);
         if ((fragment != null && fragment.isVisible())) {
-            fragment.getSongChanged();
+//            fragment.getSongChanged();
         }
     }
 
@@ -638,13 +638,11 @@ public class Test extends Fragment implements OnSongClickListener, View.OnClickL
     public void onStart() {
         super.onStart();
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter(MUSIC_BROADCAST_SEND_INTENT));
-        constraintLayoutFound.setVisibility(View.VISIBLE);
     }
 
-
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onDestroyView() {
+        super.onDestroyView();
         constraintLayoutFound.setVisibility(View.GONE);
     }
 
