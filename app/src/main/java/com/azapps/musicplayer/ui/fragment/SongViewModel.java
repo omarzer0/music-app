@@ -1,4 +1,4 @@
-package com.azapps.musicplayer.ui.activity;
+package com.azapps.musicplayer.ui.fragment;
 
 import android.app.Application;
 

@@ -15,7 +15,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.azapps.musicplayer.R;
-import com.azapps.musicplayer.ui.activity.DisplaySongsActivity;
+import com.azapps.musicplayer.ui.activity.HomeActivity;
 
 public class SearchLocalStorageFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "SearchLocal";
@@ -42,14 +42,14 @@ public class SearchLocalStorageFragment extends Fragment implements View.OnClick
         searchAgainBtn.setOnClickListener(this);
         showDoneText = view.findViewById(R.id.fragment_search_local_audio_files_done_tv);
         progressBar = view.findViewById(R.id.fragment_search_local_audio_files_progress_bar);
-        ((DisplaySongsActivity) getActivity()).loadAudioFromTheDevice();
+        ((HomeActivity) getActivity()).loadAudioFromTheDevice();
         return view;
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.fragment_search_local_audio_files_search_again_btn) {
-            ((DisplaySongsActivity) getActivity()).loadAudioFromTheDevice();
+            ((HomeActivity) getActivity()).loadAudioFromTheDevice();
         }
     }
 
@@ -66,10 +66,10 @@ public class SearchLocalStorageFragment extends Fragment implements View.OnClick
     public void onDetach() {
         super.onDetach();
         if (numberOfSongs > 0) {
-            ConstraintLayout constraintLayoutFound = getActivity().findViewById(R.id.activity_display_songs_root_constraint_found);
+            ConstraintLayout constraintLayoutFound = getActivity().findViewById(R.id.fragment_display_songs_root_constraint_found);
             constraintLayoutFound.setVisibility(View.VISIBLE);
         } else {
-            ConstraintLayout constraintLayoutNotFound = getActivity().findViewById(R.id.activity_display_songs_root_not_found);
+            ConstraintLayout constraintLayoutNotFound = getActivity().findViewById(R.id.fragment_display_songs_root_not_found);
             constraintLayoutNotFound.setVisibility(View.VISIBLE);
         }
     }

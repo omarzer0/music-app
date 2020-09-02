@@ -36,18 +36,18 @@ public class MoreBottomSheetDialog extends BottomSheetDialogFragment implements 
 
     @Override
     public void onClick(View v) {
-        ConstraintLayout constraintLayout = getActivity().findViewById(R.id.activity_display_songs_root_constraint_found);
+        ConstraintLayout constraintLayout = getActivity().findViewById(R.id.fragment_display_songs_root_constraint_found);
         switch (v.getId()) {
             case R.id.more_bottom_sheet_layout_sort_by_tv:
                 Log.e(TAG, "onClick: sort by");
                 constraintLayout.setVisibility(View.GONE);
-                Utils.replaceFragments(SortByFragment.newInstance(), getActivity().getSupportFragmentManager(), R.id.activity_display_songs_root_view, FRAGMENT_SORT_ORDER_TAG);
+                Utils.replaceFragments(SortByFragment.newInstance(), getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_SORT_ORDER_TAG);
                 dismiss();
                 break;
             case R.id.more_bottom_sheet_layout_search_local_audio_tv:
                 Log.e(TAG, "onClick: load audio");
                 constraintLayout.setVisibility(View.GONE);
-                Utils.replaceFragments(SearchLocalStorageFragment.newInstance(), getActivity().getSupportFragmentManager(), R.id.activity_display_songs_root_view, FRAGMENT_SEARCH_LOCAL_STORAGE_TAG);
+                Utils.replaceFragments(SearchLocalStorageFragment.newInstance(), getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_SEARCH_LOCAL_STORAGE_TAG);
                 dismiss();
                 break;
             case R.id.more_bottom_sheet_layout_cancel:

@@ -2,13 +2,12 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_display_songs_root_view"
+    android:id="@+id/fragment_display_songs_root_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.activity.DisplaySongsActivity">
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/activity_display_songs_root_not_found"
+        android:id="@+id/fragment_display_songs_root_not_found"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible">
@@ -31,7 +30,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/activity_display_songs_search_local_db_tv"
+            android:id="@+id/fragment_display_songs_search_local_db_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -46,7 +45,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/activity_display_songs_root_constraint_found"
+        android:id="@+id/fragment_display_songs_root_constraint_found"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#fff"
@@ -57,7 +56,7 @@
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/activity_display_songs_search_bar_constraintLayout"
+            android:id="@+id/fragment_display_songs_search_bar_constraintLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -68,7 +67,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <EditText
-                android:id="@+id/activity_display_songs_ed_search_edit_text"
+                android:id="@+id/fragment_display_songs_ed_search_edit_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -82,19 +81,19 @@
                 android:textColorHint="@android:color/tertiary_text_light"
                 android:textSize="16sp"
                 app:drawableStartCompat="@drawable/ic_search"
-                app:layout_constraintEnd_toStartOf="@+id/activity_display_songs_btn_more_options"
+                app:layout_constraintEnd_toStartOf="@+id/fragment_display_songs_btn_more_options"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
-                android:id="@+id/activity_display_songs_btn_more_options"
+                android:id="@+id/fragment_display_songs_btn_more_options"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginEnd="22dp"
                 android:background="@drawable/ic_more_horiz"
-                app:layout_constraintBottom_toBottomOf="@+id/activity_display_songs_ed_search_edit_text"
+                app:layout_constraintBottom_toBottomOf="@+id/fragment_display_songs_ed_search_edit_text"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/activity_display_songs_ed_search_edit_text" />
+                app:layout_constraintTop_toTopOf="@+id/fragment_display_songs_ed_search_edit_text" />
 
             <View
                 android:layout_width="0dp"
@@ -102,24 +101,24 @@
                 android:layout_marginTop="8dp"
                 android:background="#2CAAAAAA"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/activity_display_songs_btn_more_options"
-                app:layout_constraintStart_toStartOf="@+id/activity_display_songs_ed_search_edit_text"
-                app:layout_constraintTop_toBottomOf="@+id/activity_display_songs_ed_search_edit_text" />
+                app:layout_constraintEnd_toEndOf="@+id/fragment_display_songs_btn_more_options"
+                app:layout_constraintStart_toStartOf="@+id/fragment_display_songs_ed_search_edit_text"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_display_songs_ed_search_edit_text" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/activity_display_songs_recycler_view"
+            android:id="@+id/fragment_display_songs_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/activity_display_songs_constraint_layout_bottom_play_control"
+            app:layout_constraintBottom_toTopOf="@+id/fragment_display_songs_constraint_layout_bottom_play_control"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/activity_display_songs_search_bar_constraintLayout"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_display_songs_search_bar_constraintLayout"
             tools:listitem="@layout/song_item" />
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/activity_display_songs_constraint_layout_bottom_play_control"
+            android:id="@+id/fragment_display_songs_constraint_layout_bottom_play_control"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="#fff"
@@ -137,7 +136,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/activity_display_songs_now_playing_song_image_view"
+                android:id="@+id/fragment_display_songs_now_playing_song_image_view"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="16dp"
@@ -151,7 +150,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/activity_display_songs_controller_root_view"
+                android:id="@+id/fragment_display_songs_controller_root_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="32dp"
@@ -161,29 +160,29 @@
 
 
                 <Button
-                    android:id="@+id/activity_display_songs_previous_btn"
+                    android:id="@+id/fragment_display_songs_previous_btn"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:background="@drawable/ic_previous"
                     android:layoutDirection="ltr"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/activity_display_songs_play_btn"
+                    app:layout_constraintEnd_toStartOf="@+id/fragment_display_songs_play_btn"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
 
                 <Button
-                    android:id="@+id/activity_display_songs_play_btn"
+                    android:id="@+id/fragment_display_songs_play_btn"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:background="@drawable/ic_play_button"
                     android:layoutDirection="ltr"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/activity_display_songs_next_btn"
+                    app:layout_constraintEnd_toStartOf="@+id/fragment_display_songs_next_btn"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
-                    android:id="@+id/activity_display_songs_next_btn"
+                    android:id="@+id/fragment_display_songs_next_btn"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:background="@drawable/ic_next"
@@ -195,7 +194,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
-                android:id="@+id/activity_display_songs_now_playing_song_title"
+                android:id="@+id/fragment_display_songs_now_playing_song_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -206,8 +205,8 @@
                 android:textAlignment="viewStart"
                 android:textColor="#000"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/activity_display_songs_controller_root_view"
-                app:layout_constraintStart_toEndOf="@+id/activity_display_songs_now_playing_song_image_view"
+                app:layout_constraintEnd_toStartOf="@+id/fragment_display_songs_controller_root_view"
+                app:layout_constraintStart_toEndOf="@+id/fragment_display_songs_now_playing_song_image_view"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
