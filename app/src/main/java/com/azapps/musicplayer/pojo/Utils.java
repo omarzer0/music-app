@@ -10,7 +10,7 @@ public class Utils {
     public static void replaceFragments(Fragment fragment, FragmentManager fragmentManager, int container,String tag) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                .replace(container, fragment, tag)
+                .add(container, fragment, tag)
                 .addToBackStack(null)
                 .commit();
     }

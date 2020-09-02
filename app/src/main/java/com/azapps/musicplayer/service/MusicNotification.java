@@ -13,7 +13,6 @@ import androidx.core.app.NotificationCompat;
 
 import com.azapps.musicplayer.R;
 import com.azapps.musicplayer.broadcast.MusicBroadcast;
-import com.azapps.musicplayer.ui.activity.DisplaySongsActivity;
 
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NEXT;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PLAY;
@@ -24,8 +23,8 @@ import static com.azapps.musicplayer.pojo.Constant.CHANNEL_ID;
 public class MusicNotification {
 
     public static NotificationCompat.Builder createNotificationCompat(Context context, boolean isPlaying, String title, String imageData) {
-        Intent notificationIntent = new Intent(context, DisplaySongsActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+//        Intent notificationIntent = new Intent(context, DisplaySongsActivity.class);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
         Intent broadcastIntentPrevious = new Intent(context, MusicBroadcast.class);
         broadcastIntentPrevious.setAction(ACTION_PREVIOUS);

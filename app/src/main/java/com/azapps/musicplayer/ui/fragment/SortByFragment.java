@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.azapps.musicplayer.R;
-import com.azapps.musicplayer.ui.activity.DisplaySongsActivity;
 
 import static com.azapps.musicplayer.pojo.Constant.ADDED_TIME_ORDER;
 import static com.azapps.musicplayer.pojo.Constant.ALPHA_ORDER;
@@ -54,12 +53,12 @@ public class SortByFragment extends Fragment implements RadioGroup.OnCheckedChan
         switch (checkedId) {
             case R.id.fragment_sort_by_radio_button_rb_sort_by_alpha_order:
                 Log.e(TAG, "onCheckedChanged: alpha order");
-                ((DisplaySongsActivity) getActivity()).setOrderOfAudioFiles(ALPHA_ORDER);
+                ((Test) getParentFragment()).setOrderOfAudioFiles(ALPHA_ORDER);
                 break;
 
             case R.id.fragment_sort_by_radio_button_rb_sort_by_time_added:
                 Log.e(TAG, "onCheckedChanged: time order");
-                ((DisplaySongsActivity) getActivity()).setOrderOfAudioFiles(ADDED_TIME_ORDER);
+                ((Test) getParentFragment()).setOrderOfAudioFiles(ADDED_TIME_ORDER);
                 break;
         }
     }

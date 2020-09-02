@@ -15,7 +15,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.azapps.musicplayer.R;
-import com.azapps.musicplayer.ui.activity.DisplaySongsActivity;
 
 public class SearchLocalStorageFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "SearchLocal";
@@ -42,14 +41,14 @@ public class SearchLocalStorageFragment extends Fragment implements View.OnClick
         searchAgainBtn.setOnClickListener(this);
         showDoneText = view.findViewById(R.id.fragment_search_local_audio_files_done_tv);
         progressBar = view.findViewById(R.id.fragment_search_local_audio_files_progress_bar);
-        ((DisplaySongsActivity) getActivity()).loadAudioFromTheDevice();
+        ((Test) getParentFragment()).loadAudioFromTheDevice();
         return view;
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.fragment_search_local_audio_files_search_again_btn) {
-            ((DisplaySongsActivity) getActivity()).loadAudioFromTheDevice();
+            ((Test) getParentFragment()).loadAudioFromTheDevice();
         }
     }
 

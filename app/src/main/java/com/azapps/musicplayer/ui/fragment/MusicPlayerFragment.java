@@ -19,11 +19,9 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.azapps.musicplayer.R;
-import com.azapps.musicplayer.ui.activity.DisplaySongsActivity;
 
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NAME;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NEXT;
@@ -53,6 +51,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     private String songData;
     private String songArtist;
     private int totalTime;
+    private Test test =(Test) getParentFragment();
 
     public MusicPlayerFragment() {
     }
@@ -114,9 +113,9 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     }
 
     private void setTotalTimeLabel_TimeElapsed_SongTitleAndSongArtist() {
-        currentPosition = ((DisplaySongsActivity) getActivity()).getCurrentSongPosition();
+        currentPosition = test.getCurrentSongPosition();
         totalTimeLabel.setText(createTimeLabel(totalTime));
-        elapsedTimeLabel.setText(createTimeLabel(((DisplaySongsActivity) getActivity()).getCurrentSongPosition()));
+        elapsedTimeLabel.setText(createTimeLabel(test.getCurrentSongPosition()));
         positionSeekBar.setMax(totalTime);
         positionSeekBar.setProgress(currentPosition);
         songTitleTV.setText(songTitle);
@@ -132,7 +131,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     positionSeekBar.setProgress(progress);
-                    ((DisplaySongsActivity) getActivity()).setCurrentSongPosition(progress);
+                    (test).setCurrentSongPosition(progress);
                     elapsedTimeLabel.setText(createTimeLabel(progress));
                 }
             }
@@ -154,7 +153,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         mUpdateSeekBar = new Runnable() {
             @Override
             public void run() {
-                currentPosition = ((DisplaySongsActivity) getActivity()).getCurrentSongPosition();
+                currentPosition = (test).getCurrentSongPosition();
                 positionSeekBar.setProgress(currentPosition);
                 mSeekBarUpdateHandler.postDelayed(this, 50);
                 String elapsedTime = createTimeLabel(currentPosition);
@@ -192,7 +191,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     }
 
     public void play() {
-        if (((DisplaySongsActivity) getActivity()).getIsPlaying()) {
+        if ((test).getIsPlaying()) {
             // mediaPlayer is in pause state
             mSeekBarUpdateHandler.postDelayed(mUpdateSeekBar, 0);
             playBtn.setBackgroundResource(R.drawable.ic_pause);
@@ -203,7 +202,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     }
 
     public void reversePlay() {
-        if (((DisplaySongsActivity) getActivity()).getIsPlaying()) {
+        if ((test).getIsPlaying()) {
             // mediaPlayer is in pause state
             mSeekBarUpdateHandler.postDelayed(mUpdateSeekBar, 0);
             playBtn.setBackgroundResource(R.drawable.ic_play_button);
@@ -218,18 +217,18 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fragment_music_player_previous:
-                ((DisplaySongsActivity) getActivity()).previousBtnClicked();
+                (test).previousBtnClicked();
                 reversePlay();
                 getSongChanged();
                 break;
 
             case R.id.fragment_music_player_playBtn:
-                ((DisplaySongsActivity) getActivity()).playBtnClicked();
+                (test).playBtnClicked();
                 play();
                 break;
 
             case R.id.fragment_music_player_next:
-                ((DisplaySongsActivity) getActivity()).nextBtnClicked();
+                (test).nextBtnClicked();
                 reversePlay();
                 getSongChanged();
         }
@@ -245,18 +244,18 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
             switch (action) {
 
                 case ACTION_PREVIOUS:
-                    ((DisplaySongsActivity) getActivity()).previousBtnClicked();
+                    (test).previousBtnClicked();
                     reversePlay();
                     getSongChanged();
                     break;
 
                 case ACTION_PLAY:
-                    ((DisplaySongsActivity) getActivity()).playBtnClicked();
+                    (test).playBtnClicked();
                     play();
                     break;
 
                 case ACTION_NEXT:
-                    ((DisplaySongsActivity) getActivity()).nextBtnClicked();
+                    (test).nextBtnClicked();
                     reversePlay();
                     getSongChanged();
                     break;
@@ -273,13 +272,15 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     }
 
     public void getSongChanged() {
-        songData = ((DisplaySongsActivity) getActivity()).getSongData();
-        songTitle = ((DisplaySongsActivity) getActivity()).getSongTitle();
-        songArtist = ((DisplaySongsActivity) getActivity()).getSongArtist();
-        totalTime = ((DisplaySongsActivity) getActivity()).getSongTotalTime();
+        songData = (test).getSongData();
+        songTitle = (test).getSongTitle();
+        songArtist = (test).getSongArtist();
+        totalTime = (test).getSongTotalTime();
         getSongExtra();
         setTotalTimeLabel_TimeElapsed_SongTitleAndSongArtist();
     }
+
+//    Test fragment = (Test) getParentFragment();
 
     @Override
     public void onDetach() {
@@ -287,7 +288,10 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         getActivity().unregisterReceiver(broadcastReceiver);
         getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         mSeekBarUpdateHandler.removeCallbacks(mUpdateSeekBar);
-        ConstraintLayout constraintLayout = getActivity().findViewById(R.id.activity_display_songs_root_constraint_found);
-        constraintLayout.setVisibility(View.VISIBLE);
+//        ConstraintLayout constraintLayout = findViewById(R.id.activity_display_songs_root_constraint_found);
+//        constraintLayout.setVisibility(View.VISIBLE);
+//        if (fragment != null) {
+//            fragment.setConstraintLayoutFound(View.VISIBLE);
+//        }
     }
 }
