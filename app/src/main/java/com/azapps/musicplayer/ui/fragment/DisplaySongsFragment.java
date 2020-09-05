@@ -103,7 +103,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_display_songs, container, false);
+        View view = inflater.inflate(R.layout.fragment_display_songs, container, false);
         initViews(view);
 //        prepareMoreOptionImg();
         setRecyclerView(view);
