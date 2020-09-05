@@ -282,10 +282,14 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     @Override
     public void onDetach() {
         super.onDetach();
-        getActivity().unregisterReceiver(broadcastReceiver);
-        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        mSeekBarUpdateHandler.removeCallbacks(mUpdateSeekBar);
-        ConstraintLayout constraintLayout = getActivity().findViewById(R.id.fragment_display_songs_root_constraint_found);
-        constraintLayout.setVisibility(View.VISIBLE);
+        try {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            mSeekBarUpdateHandler.removeCallbacks(mUpdateSeekBar);
+            ConstraintLayout constraintLayout = getActivity().findViewById(R.id.fragment_display_songs_root_constraint_found);
+            constraintLayout.setVisibility(View.VISIBLE);
+        }catch (Exception e){
+            e.getMessage();
+        }
     }
 }

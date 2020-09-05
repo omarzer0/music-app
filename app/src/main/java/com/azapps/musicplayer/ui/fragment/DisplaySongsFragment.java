@@ -75,11 +75,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     private static final String TAG = "DisplaySongsActivity";
     // ui
-    private ArrayList<Song> songList;
-    private ArrayList<Song> filteredArrayList;
-    private SongAdapter adapter;
-    private SongViewModel songViewModel;
-
     private Button previousBtn, playBtn, nextBtn, moreOptionsBtn;
     private EditText searchEditText;
     private ImageView nowPlayingImageView;
@@ -90,6 +85,11 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     private ConstraintLayout constraintLayoutFound, constraintLayoutNotFound;
 
     // vars
+    private ArrayList<Song> songList;
+    private ArrayList<Song> filteredArrayList;
+    private SongAdapter adapter;
+    private SongViewModel songViewModel;
+    private LiveData<List<Song>> listLiveDataSongs;
     private Song song;
     private int currentSongClickedPosition = -1;
     private boolean isLooping = false;
@@ -200,9 +200,8 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     private void modelViewInstantiate() {
         songViewModel = new ViewModelProvider(this,
-                ViewModelProvider.AndroidViewModelFactory.getInstance(getActivity().getApplication()))
-                .get(SongViewModel.class);
-        LiveData<List<Song>> listLiveDataSongs = null;
+                ViewModelProvider.AndroidViewModelFactory.getInstance(getActivity().getApplication())).get(SongViewModel.class);
+        listLiveDataSongs = null;
         if (orderOfAudioFiles == ADDED_TIME_ORDER) {
             songViewModel.viewModelOrder = ADDED_TIME_ORDER;
             listLiveDataSongs = songViewModel.getAllSongsByAddedOrder();
@@ -214,6 +213,10 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         }
 
         // switch on order by function
+        setSongListObserver();
+    }
+
+    private void setSongListObserver(){
         if (songListObserver != null) {
             listLiveDataSongs.removeObserver(songListObserver);
         }
@@ -263,7 +266,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             }
         }
         cursor.close();
-        adapter.submitList(songList);
+//        adapter.submitList(songList);
     }
 
     private void setRecyclerView(View view) {
@@ -293,24 +296,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         }
         return song;
     }
-
-//    private void prepareMoreOptionImg() {
-//        Button moreOptionsImg = findViewById(R.id.activity_display_songs_img_more_options);
-//        moreOptionsImg.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                freeDateBase();
-//                try {
-//                    getMusic();
-//                    if (songList.size() == 0)
-//                        Toast.makeText(DisplaySongsActivity.this, "oooops! no music was found", Toast.LENGTH_SHORT).show();
-//                } catch (Exception e) {
-//                    Log.e("error", "onCreate: " + e.getMessage());
-//                    Toast.makeText(DisplaySongsActivity.this, "Error can't load any song", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
-//    }
 
     private void freeDateBase() {
         try {
@@ -481,16 +466,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         }
     }
 
-    public void setLayoutVisible() {
-        constraintLayoutFound.setVisibility(View.VISIBLE);
-        constraintLayoutNotFound.setVisibility(View.GONE);
-    }
-
-    public void setLayoutGone() {
-        constraintLayoutFound.setVisibility(View.GONE);
-        constraintLayoutNotFound.setVisibility(View.VISIBLE);
-    }
-
     public void playBtnClicked() {
         if (mp != null) {
             startMyService();
@@ -602,7 +577,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     public boolean checkOnAudioFocus() {
         int audioFocusResult = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-        return true;
+        return audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
     }
 
 
@@ -641,6 +616,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             fragment.getSongChanged();
         }
     }
+
 
 
 }
