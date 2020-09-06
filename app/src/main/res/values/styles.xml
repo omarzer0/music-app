@@ -1,11 +1,11 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">#fff</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:navigationBarColor">#fff</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">#fff</item>
         <item name="bottomSheetDialogTheme">@style/MyBottomSheetDialogTheme</item>
     </style>
 
@@ -20,16 +20,10 @@
         <item name="android:textColor">#8BAAAAAA</item>
     </style>
 
-    <style name="TextPlay">
-        <item name="tint">#FF0000</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">#FF0000</item>
-    </style>
-
     <style name="MyBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/MYBottomSheetStyle</item>
         <item name="android:windowIsFloating">false</item>
-        <item name="android:navigationBarColor">#fff</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">#fff</item>
         <item name="colorPrimaryDark">@android:color/transparent</item>
     </style>
 

@@ -1,10 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">Music Player</string>
-    <string name="zero_start_time" translatable="false">0:00</string>
     <string name="search_for_songs"><font size="14">search for music</font></string>
     <string name="choose_a_song">choose a song</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="sort_by">Sort by</string>
     <string name="load_local_audio_files">Load local Audio files</string>
     <string name="cancel">Cancel</string>
