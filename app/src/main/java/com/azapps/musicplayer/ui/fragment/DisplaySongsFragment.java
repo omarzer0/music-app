@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -421,6 +422,9 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             mp.setDataSource(getActivity(), uri);
             mp.prepare();
         } catch (IOException e) {
+            Toast.makeText(getActivity(), "This Audio does not exist anymore", Toast.LENGTH_SHORT).show();
+            songViewModel.delete(detectFromWhichList(currentSongClickedPosition));
+            nextBtnClicked();
             e.printStackTrace();
         }
         mp.setOnPreparedListener(this);
@@ -480,6 +484,8 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 mp.pause();
                 playBtn.setBackgroundResource(R.drawable.ic_play_button);
             }
+        }else {
+            onSongClick(0);
         }
     }
 

@@ -83,7 +83,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         View view = inflater.inflate(R.layout.fragment_music_player, container, false);
         initViews(view);
         getSongExtra();
