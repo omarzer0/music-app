@@ -19,10 +19,11 @@ public class Song  {
     private String year;
     private long lastModifyDate;
     private long size;
+    private boolean isFavourite;
 
 
     @Ignore
-    public Song(String title, String displayName, String artist, String album, String data, String year, long lastModifyDate, long size) {
+    public Song(String title, String displayName, String artist, String album, String data, String year, long lastModifyDate, long size,boolean isFavourite) {
         this.title = checkIfEmpty(title);
         this.displayName = checkIfEmpty(displayName);
         this.artist = checkIfEmpty(artist);
@@ -31,9 +32,10 @@ public class Song  {
         this.year = checkIfEmpty(year);
         this.size = size;
         this.lastModifyDate = lastModifyDate;
+        this.isFavourite = isFavourite;
     }
 
-    public Song(int id, String title, String displayName, String artist, String album, String data, String year, long lastModifyDate, long size) {
+    public Song(int id, String title, String displayName, String artist, String album, String data, String year, long lastModifyDate, long size, boolean isFavourite) {
         this.id = id;
         this.title = checkIfEmpty(title);
         this.displayName = checkIfEmpty(displayName);
@@ -43,6 +45,7 @@ public class Song  {
         this.year = checkIfEmpty(year);
         this.size = size;
         this.lastModifyDate = lastModifyDate;
+        this.isFavourite = isFavourite;
     }
 
     public long getLastModifyDate() {
@@ -116,6 +119,15 @@ public class Song  {
     public void setSize(long size) {
         this.size = size;
     }
+
+    public boolean isFavourite() {
+        return isFavourite;
+    }
+
+    public void setFavourite(boolean favourite) {
+        isFavourite = favourite;
+    }
+
 
     private String checkIfEmpty(String s) {
         if (s == null || s.equals("<unknown>")) return "unknown";

@@ -185,7 +185,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     public void loadAudioFromTheDevice() {
         modelViewInstantiate();
-        freeDateBase();
+//        freeDateBase();
         getMusic();
     }
 
@@ -216,7 +216,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         setSongListObserver();
     }
 
-    private void setSongListObserver(){
+    private void setSongListObserver() {
         if (songListObserver != null) {
             listLiveDataSongs.removeObserver(songListObserver);
         }
@@ -259,14 +259,25 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 String year = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.YEAR));
                 long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
                 // Save to audioList
-                Song song = new Song(title, displayName, artist, album, data, year, lastDateModified, size);
-//                songList.add(song);
-                songViewModel.insert(song);
+                Song song = new Song(title, displayName, artist, album, data, year, lastDateModified, size, false);
+
+                if (!checkIfSongExists(data)) {
+                    songViewModel.insert(song);
+                }
 
             }
         }
         cursor.close();
 //        adapter.submitList(songList);
+    }
+
+    boolean checkIfSongExists(String data) {
+        if (songList == null) return false;
+        for (Song song : songList) {
+            if (data.equals(song.getData()))
+                return true;
+        }
+        return false;
     }
 
     private void setRecyclerView(View view) {
@@ -297,13 +308,13 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         return song;
     }
 
-    private void freeDateBase() {
-        try {
-            songViewModel.deleteAllSongs();
-        } catch (Exception e) {
-            e.getMessage();
-        }
-    }
+//    private void freeDateBase() {
+//        try {
+//            songViewModel.deleteAllSongs();
+//        } catch (Exception e) {
+//            e.getMessage();
+//        }
+//    }
 
     private void initEditTextSearchFunction() {
 
@@ -376,8 +387,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 moreOptionsBtnClicked();
                 break;
             case R.id.fragment_display_songs_search_local_db_tv:
-//                ConstraintLayout constraintLayoutFound = findViewById(R.id.activity_display_songs_root_constraint_found);
-
                 constraintLayoutNotFound.setVisibility(View.GONE);
                 Utils.replaceFragments(SearchLocalStorageFragment.newInstance(), getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_SEARCH_LOCAL_STORAGE_TAG);
                 break;
@@ -457,12 +466,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                     song.getArtist(), song.getData(), mp.getDuration()),
                     getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_MUSIC_PLAYER_TAG);
             constraintLayoutFound.setVisibility(View.GONE);
-
-//            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-//            transaction.replace(R.id.activity_display_songs_root_view, FragmentB.newInstance(), "fragment_b")
-//                    .addToBackStack(null)
-//                    .commit();
-//            setLayoutGone();
         }
     }
 
@@ -616,7 +619,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             fragment.getSongChanged();
         }
     }
-
 
 
 }
