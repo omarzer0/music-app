@@ -95,6 +95,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     private Song song;
     private int currentSongClickedPosition = -1;
     private int deletedSongPosition = -1;
+    private int deletedSongId = -1;
     private boolean isLooping = false;
     private static int orderOfAudioFiles = ADDED_TIME_ORDER;
 
@@ -192,14 +193,16 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         getMusic();
     }
 
-//    private void freeDateBase() {
-//        Log.e(TAG, "freeDateBase: ");
-//        try {
-//            songViewModel.deleteAllSongs();
-//        } catch (Exception e) {
-//            e.getMessage();
-//        }
-//    }
+    private void freeDateBase() {
+        Log.e(TAG, "freeDateBase: ");
+        try {
+            songViewModel.deleteAllSongs();
+            Log.e(TAG, "freeDateBase: try" );
+        } catch (Exception e) {
+            Log.e(TAG, "freeDateBase: catch" );
+            e.getMessage();
+        }
+    }
 
     private void audioFilesWasFound() {
         if (songList.size() > 0) {
@@ -312,7 +315,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     private Song detectFromWhichList(int position) {
         Song song;
-        if (filteredArrayList == null) {
+        if (filteredArrayList == null || filteredArrayList.size() == 0) {
             song = songList.get(position);
         } else {
             song = filteredArrayList.get(position);
@@ -406,21 +409,28 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     public void onSongMoreOptionClick(int position) {
         String path = "";
         Song deletedSong = detectFromWhichList(position);
-        Log.e(TAG, "onSongMoreOptionClick: " + song.getTitle() + "\n");
-        Log.e(TAG, "onSongMoreOptionClick: " + deletedSong.getTitle() + "\n");
-        if (!song.getData().equals(deletedSong.getData())) {
+        deletedSongId = deletedSong.getId();
+        if (song == null || !song.getData().equals(deletedSong.getData())) {
             path = deletedSong.getData();
-            Log.e(TAG, "onSongMoreOptionClick: " + deletedSong.getTitle() + "\n" + deletedSong.getId());
         }
-        DeleteSongBottomSheetDialog deleteSongBottomSheetDialog = new DeleteSongBottomSheetDialog(path, position);
+        DeleteSongBottomSheetDialog deleteSongBottomSheetDialog = new DeleteSongBottomSheetDialog(path, deletedSongId);
         deleteSongBottomSheetDialog.show(getActivity().getSupportFragmentManager(), DELETE_BOTTOM_SHEET_TAG);
     }
 
-    public void submitListChanges(int position) {
-        songViewModel.delete(detectFromWhichList(position));
-        Log.e(TAG, "submitListChanges: " + position + "\n" + songList.get(position).getTitle());
+    public void submitListChanges(int id) {
+        songViewModel.delete(songList.get(mapBetweenSongListIndexAndFilteredArrayListIndex(id)));
+        if (filteredArrayList == null || filteredArrayList.size() == 0) adapter.submitList(filteredArrayList);
+        else adapter.submitList(songList);
     }
 
+    private int mapBetweenSongListIndexAndFilteredArrayListIndex(int id) {
+        for (int i = 0; i < songList.size(); i++) {
+            if (songList.get(i).getId() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     private void initMediaPlayer() {
         //isLooping = true;

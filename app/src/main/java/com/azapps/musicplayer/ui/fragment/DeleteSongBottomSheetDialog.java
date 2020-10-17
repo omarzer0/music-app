@@ -19,11 +19,11 @@ import java.io.File;
 public class DeleteSongBottomSheetDialog extends BottomSheetDialogFragment implements View.OnClickListener {
 
     private String removedPath;
-    private int position;
+    private int id;
 
-    public DeleteSongBottomSheetDialog(String path, int position) {
+    public DeleteSongBottomSheetDialog(String path, int id) {
         removedPath = path;
-        this.position = position;
+        this.id = id;
     }
 
     @Nullable
@@ -43,7 +43,7 @@ public class DeleteSongBottomSheetDialog extends BottomSheetDialogFragment imple
             case R.id.delete_bottom_sheet_layout_delete_tv:
                 if (new File(removedPath).delete()) {
                     Toast.makeText(getActivity(), "Deleted", Toast.LENGTH_SHORT).show();
-                    ((HomeActivity) getActivity()).submitListChanges(position);
+                    ((HomeActivity) getActivity()).submitListChanges(id);
                 } else if (removedPath.equals("")) {
                     Toast.makeText(getActivity(), "cannot delete this file, it is being played!", Toast.LENGTH_SHORT).show();
 
