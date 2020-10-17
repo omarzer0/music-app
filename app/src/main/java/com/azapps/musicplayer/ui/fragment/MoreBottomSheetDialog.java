@@ -27,7 +27,7 @@ public class MoreBottomSheetDialog extends BottomSheetDialogFragment implements 
         View view = inflater.inflate(R.layout.more_bottom_sheet_layout, container, false);
         TextView sortByTv = view.findViewById(R.id.more_bottom_sheet_layout_sort_by_tv);
         TextView loadAudio = view.findViewById(R.id.more_bottom_sheet_layout_search_local_audio_tv);
-        TextView cancel = view.findViewById(R.id.more_bottom_sheet_layout_cancel);
+        TextView cancel = view.findViewById(R.id.more_bottom_sheet_layout_cancel_tv);
         sortByTv.setOnClickListener(this);
         loadAudio.setOnClickListener(this);
         cancel.setOnClickListener(this);
@@ -50,7 +50,7 @@ public class MoreBottomSheetDialog extends BottomSheetDialogFragment implements 
                 Utils.replaceFragments(SearchLocalStorageFragment.newInstance(), getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_SEARCH_LOCAL_STORAGE_TAG);
                 dismiss();
                 break;
-            case R.id.more_bottom_sheet_layout_cancel:
+            case R.id.more_bottom_sheet_layout_cancel_tv:
                 dismiss();
                 break;
         }

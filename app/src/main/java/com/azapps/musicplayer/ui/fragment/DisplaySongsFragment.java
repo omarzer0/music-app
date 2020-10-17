@@ -62,6 +62,7 @@ import static com.azapps.musicplayer.pojo.Constant.ACTION_PLAY;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PREVIOUS;
 import static com.azapps.musicplayer.pojo.Constant.ADDED_TIME_ORDER;
 import static com.azapps.musicplayer.pojo.Constant.ALPHA_ORDER;
+import static com.azapps.musicplayer.pojo.Constant.DELETE_BOTTOM_SHEET_TAG;
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_MUSIC_PLAYER_TAG;
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_SEARCH_LOCAL_STORAGE_TAG;
 import static com.azapps.musicplayer.pojo.Constant.MORE_BOTTOM_SHEET_TAG;
@@ -93,6 +94,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     private LiveData<List<Song>> listLiveDataSongs;
     private Song song;
     private int currentSongClickedPosition = -1;
+    private int deletedSongPosition = -1;
     private boolean isLooping = false;
     private static int orderOfAudioFiles = ADDED_TIME_ORDER;
 
@@ -189,6 +191,15 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 //        freeDateBase();
         getMusic();
     }
+
+//    private void freeDateBase() {
+//        Log.e(TAG, "freeDateBase: ");
+//        try {
+//            songViewModel.deleteAllSongs();
+//        } catch (Exception e) {
+//            e.getMessage();
+//        }
+//    }
 
     private void audioFilesWasFound() {
         if (songList.size() > 0) {
@@ -309,14 +320,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         return song;
     }
 
-//    private void freeDateBase() {
-//        try {
-//            songViewModel.deleteAllSongs();
-//        } catch (Exception e) {
-//            e.getMessage();
-//        }
-//    }
-
     private void initEditTextSearchFunction() {
 
         searchEditText.addTextChangedListener(new TextWatcher() {
@@ -399,6 +402,26 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         moreBottomSheetDialog.show(getActivity().getSupportFragmentManager(), MORE_BOTTOM_SHEET_TAG);
     }
 
+    @Override
+    public void onSongMoreOptionClick(int position) {
+        String path = "";
+        Song deletedSong = detectFromWhichList(position);
+        Log.e(TAG, "onSongMoreOptionClick: " + song.getTitle() + "\n");
+        Log.e(TAG, "onSongMoreOptionClick: " + deletedSong.getTitle() + "\n");
+        if (!song.getData().equals(deletedSong.getData())) {
+            path = deletedSong.getData();
+            Log.e(TAG, "onSongMoreOptionClick: " + deletedSong.getTitle() + "\n" + deletedSong.getId());
+        }
+        DeleteSongBottomSheetDialog deleteSongBottomSheetDialog = new DeleteSongBottomSheetDialog(path, position);
+        deleteSongBottomSheetDialog.show(getActivity().getSupportFragmentManager(), DELETE_BOTTOM_SHEET_TAG);
+    }
+
+    public void submitListChanges(int position) {
+        songViewModel.delete(detectFromWhichList(position));
+        Log.e(TAG, "submitListChanges: " + position + "\n" + songList.get(position).getTitle());
+    }
+
+
     private void initMediaPlayer() {
         //isLooping = true;
         // here we will change it later when ask the user to go on or repeat
@@ -480,12 +503,15 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 mp.start();
                 mp.setOnCompletionListener(this);
                 playBtn.setBackgroundResource(R.drawable.ic_pause);
+                Log.e(TAG, "playBtnClicked: " + currentSongClickedPosition);
             } else {
                 mp.pause();
                 playBtn.setBackgroundResource(R.drawable.ic_play_button);
+                Log.e(TAG, "playBtnClicked: " + currentSongClickedPosition);
             }
-        }else {
+        } else {
             onSongClick(0);
+            Log.e(TAG, "playBtnClicked: " + currentSongClickedPosition);
         }
     }
 

@@ -18,6 +18,7 @@ public class Constant {
     public static final String FRAGMENT_DISPLAY_SONG = "display song fragment tag";
     public static final String FRAGMENT_SEARCH_LOCAL_STORAGE_TAG = "search local storage fragment tag";
     public static final String MORE_BOTTOM_SHEET_TAG = "more bottom sheet tag";
+    public static final String DELETE_BOTTOM_SHEET_TAG = "delete bottom sheet tag";
     public static final int ADDED_TIME_ORDER = 1;
     public static final int ALPHA_ORDER = 2;
     public static final int REQUEST_PERMISSION_STORAGE = 1000;

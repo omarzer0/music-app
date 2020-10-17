@@ -8,58 +8,42 @@
     android:paddingEnd="32dp">
 
     <TextView
-        android:id="@+id/more_bottom_sheet_layout_sort_by_tv"
+        android:id="@+id/delete_bottom_sheet_layout_delete_tv"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="@string/sort_by"
+        android:text="@string/delete"
+        android:textAlignment="center"
         android:textColor="#F43636"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <TextView
-        android:id="@+id/more_bottom_sheet_layout_search_local_audio_tv"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/load_local_audio_files"
-        android:textColor="#F43636"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/more_bottom_sheet_layout_sort_by_tv" />
-
     <View
-        android:id="@+id/view2"
+        android:id="@+id/splitter"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="32dp"
         android:background="#2CAAAAAA"
-        app:layout_constraintTop_toBottomOf="@+id/more_bottom_sheet_layout_search_local_audio_tv" />
+        app:layout_constraintTop_toBottomOf="@+id/delete_bottom_sheet_layout_delete_tv" />
 
     <TextView
-        android:id="@+id/more_bottom_sheet_layout_cancel_tv"
+        android:id="@+id/delete_bottom_sheet_layout_cancel_tv"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
         android:text="@string/cancel"
+        android:textAlignment="center"
         android:textColor="#F43636"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view2"
-        android:layout_marginBottom="32dp"/>
+        app:layout_constraintTop_toBottomOf="@+id/splitter" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

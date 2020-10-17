@@ -17,4 +17,5 @@
     <string name="storage_permission_alert_message">هذا الاذن مطلوب لتحميل الملفات الصوتية من الهاتف</string>
     <string name="ok">تم</string>
     <string name="music_player">مشغل الصوتيات</string>
+    <string name="delete">حذف</string>
 </resources>

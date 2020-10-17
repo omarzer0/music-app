@@ -101,4 +101,9 @@ public class HomeActivity extends AppCompatActivity {
         getDisplaySongFragmentInstance();
         displaySongsFragment.setOrderOfAudioFiles(alphaOrder);
     }
+
+    public void submitListChanges(int position){
+        getDisplaySongFragmentInstance();
+        displaySongsFragment.submitListChanges(position);
+    }
 }
