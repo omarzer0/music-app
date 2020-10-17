@@ -503,11 +503,9 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 mp.start();
                 mp.setOnCompletionListener(this);
                 playBtn.setBackgroundResource(R.drawable.ic_pause);
-                Log.e(TAG, "playBtnClicked: " + currentSongClickedPosition);
             } else {
                 mp.pause();
                 playBtn.setBackgroundResource(R.drawable.ic_play_button);
-                Log.e(TAG, "playBtnClicked: " + currentSongClickedPosition);
             }
         } else {
             onSongClick(0);
