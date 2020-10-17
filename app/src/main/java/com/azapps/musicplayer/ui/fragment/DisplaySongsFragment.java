@@ -95,6 +95,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     private Song song;
     private int currentSongClickedPosition = -1;
     private int deletedSongPosition = -1;
+    private int deletedSongId = -1;
     private boolean isLooping = false;
     private static int orderOfAudioFiles = ADDED_TIME_ORDER;
 
@@ -188,18 +189,18 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     public void loadAudioFromTheDevice() {
         modelViewInstantiate();
-//        freeDateBase();
+        freeDateBase();
         getMusic();
     }
 
-//    private void freeDateBase() {
-//        Log.e(TAG, "freeDateBase: ");
-//        try {
-//            songViewModel.deleteAllSongs();
-//        } catch (Exception e) {
-//            e.getMessage();
-//        }
-//    }
+    private void freeDateBase() {
+        Log.e(TAG, "freeDateBase: ");
+        try {
+            songViewModel.deleteAllSongs();
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
 
     private void audioFilesWasFound() {
         if (songList.size() > 0) {
@@ -406,8 +407,8 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     public void onSongMoreOptionClick(int position) {
         String path = "";
         Song deletedSong = detectFromWhichList(position);
-        Log.e(TAG, "onSongMoreOptionClick: " + song.getTitle() + "\n");
-        Log.e(TAG, "onSongMoreOptionClick: " + deletedSong.getTitle() + "\n");
+//        Log.e(TAG, "onSongMoreOptionClick: " + song.getTitle() + "\n");
+//        Log.e(TAG, "onSongMoreOptionClick: " + deletedSong.getTitle() + "\n");
         if (!song.getData().equals(deletedSong.getData())) {
             path = deletedSong.getData();
             Log.e(TAG, "onSongMoreOptionClick: " + deletedSong.getTitle() + "\n" + deletedSong.getId());
@@ -417,8 +418,9 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     }
 
     public void submitListChanges(int position) {
-        songViewModel.delete(detectFromWhichList(position));
         Log.e(TAG, "submitListChanges: " + position + "\n" + songList.get(position).getTitle());
+        songViewModel.delete(detectFromWhichList(position));
+//        adapter.submitList(songList);
     }
 
 
