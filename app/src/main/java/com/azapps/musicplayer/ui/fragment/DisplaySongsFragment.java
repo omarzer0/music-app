@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,6 +52,7 @@ import com.azapps.musicplayer.adapter.SongAdapter;
 import com.azapps.musicplayer.pojo.Song;
 import com.azapps.musicplayer.pojo.Utils;
 import com.azapps.musicplayer.service.MusicService;
+import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -77,9 +79,10 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     private static final String TAG = "DisplaySongsActivity";
     // ui
-    private Button previousBtn, playBtn, nextBtn, moreOptionsBtn;
+    private Button previousBtn, nextBtn, moreOptionsBtn;
+    private ImageButton playBtn;
     private EditText searchEditText;
-    private ImageView nowPlayingImageView;
+    private CircularImageView nowPlayingImageView;
     private TextView nowPlayingTextView, clickToLoadDataTv;
     private ConstraintLayout bottomControlConstraintLayout;
     private MediaPlayer mp;
@@ -511,11 +514,11 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             if (!mp.isPlaying() && currentSongClickedPosition != -1) {
                 mp.start();
                 mp.setOnCompletionListener(this);
-                playBtn.setBackgroundResource(R.drawable.ic_pause);
+                playBtn.setImageResource(R.drawable.ic_pause);
                 Log.e(TAG, "playBtnClicked: " + currentSongClickedPosition);
             } else {
                 mp.pause();
-                playBtn.setBackgroundResource(R.drawable.ic_play_button);
+                playBtn.setImageResource(R.drawable.ic_play_button);
                 Log.e(TAG, "playBtnClicked: " + currentSongClickedPosition);
             }
         } else {
@@ -615,7 +618,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             mp.release();
             mp = null;
             audioManager.abandonAudioFocus(this);
-            playBtn.setBackgroundResource(R.drawable.ic_play_button);
+            playBtn.setImageResource(R.drawable.ic_play_button);
         }
     }
 
@@ -651,7 +654,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     @Override
     public void onCompletion(MediaPlayer mp) {
         Log.e("TAG", "onCompletion: ");
-        playBtn.setBackgroundResource(R.drawable.ic_play_button);
+        playBtn.setImageResource(R.drawable.ic_play_button);
         releaseMediaPlayer();
         initMediaPlayer();
         nextBtnClicked();

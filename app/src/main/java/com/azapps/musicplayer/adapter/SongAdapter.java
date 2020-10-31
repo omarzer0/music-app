@@ -34,7 +34,6 @@ public class SongAdapter extends ListAdapter<Song, SongViewHolder> {
         Song currentSong = getItem(position);
         holder.titleTV.setText(currentSong.getTitle());
         holder.artistTV.setText(currentSong.getArtist());
-        holder.albumTV.setText(currentSong.getAlbum());
         holder.moreImageView.setImageResource(R.drawable.ic_more);
     }
 }

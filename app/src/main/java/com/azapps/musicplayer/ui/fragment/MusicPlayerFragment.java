@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.azapps.musicplayer.R;
 import com.azapps.musicplayer.ui.activity.HomeActivity;
+import com.mikhaellopez.circularimageview.CircularImageView;
 
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NAME;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NEXT;
@@ -39,8 +40,9 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     private static final String DATA_EXTRA = "data";
     private static final String TOTAL_TIME_EXTRA = "total time";
 
-    private ImageView songCoverImage;
-    private Button playBtn, nextBtn, previousBtn;
+    private CircularImageView songCoverImage;
+    private Button nextBtn, previousBtn;
+    private ImageButton playBtn;
     private SeekBar positionSeekBar;
     private TextView elapsedTimeLabel, totalTimeLabel, songTitleTV, songArtistTV;
 
@@ -126,7 +128,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     private void prepareAndListenToPositionSeekBarChanges() {
         // position Bar
         positionSeekBar.setMax(totalTime);
-        positionSeekBar.setPadding(0, 0, 0, 0);
+//        positionSeekBar.setPadding(0, 0, 0, 0);
         positionSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -195,10 +197,10 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         if (((HomeActivity) getActivity()).getIsPlaying()) {
             // mediaPlayer is in pause state
             mSeekBarUpdateHandler.postDelayed(mUpdateSeekBar, 0);
-            playBtn.setBackgroundResource(R.drawable.ic_pause);
+            playBtn.setImageResource(R.drawable.ic_pause);
         } else {
             // mediaPlayer is in play state
-            playBtn.setBackgroundResource(R.drawable.ic_play_button);
+            playBtn.setImageResource(R.drawable.ic_play_button);
         }
     }
 
@@ -206,10 +208,10 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         if (((HomeActivity) getActivity()).getIsPlaying()) {
             // mediaPlayer is in pause state
             mSeekBarUpdateHandler.postDelayed(mUpdateSeekBar, 0);
-            playBtn.setBackgroundResource(R.drawable.ic_play_button);
+            playBtn.setImageResource(R.drawable.ic_play_button);
         } else {
             // mediaPlayer is in play state
-            playBtn.setBackgroundResource(R.drawable.ic_pause);
+            playBtn.setImageResource(R.drawable.ic_pause);
         }
     }
 
@@ -288,7 +290,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
             mSeekBarUpdateHandler.removeCallbacks(mUpdateSeekBar);
             ConstraintLayout constraintLayout = getActivity().findViewById(R.id.fragment_display_songs_root_constraint_found);
             constraintLayout.setVisibility(View.VISIBLE);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.getMessage();
         }
     }

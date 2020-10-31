@@ -13,7 +13,7 @@ import com.azapps.musicplayer.R;
 
 public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
     private static final String TAG = "SongViewHolder";
-    TextView titleTV, artistTV, albumTV;
+    TextView titleTV, artistTV;
     ImageView moreImageView;
     ConstraintLayout root;
     OnSongClickListener listener;
@@ -22,14 +22,12 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         super(itemView);
         titleTV = itemView.findViewById(R.id.song_item_tv_title);
         artistTV = itemView.findViewById(R.id.song_item_tv_artist);
-        albumTV = itemView.findViewById(R.id.song_item_tv_album);
         moreImageView = itemView.findViewById(R.id.song_item_img_more);
         root = itemView.findViewById(R.id.song_item_root_layout);
 
         moreImageView.setOnClickListener(this);
         titleTV.setOnClickListener(this);
         artistTV.setOnClickListener(this);
-        albumTV.setOnClickListener(this);
         listener = onSongClickListener;
     }
 
