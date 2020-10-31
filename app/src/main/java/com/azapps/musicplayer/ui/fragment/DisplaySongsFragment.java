@@ -216,7 +216,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         setSongListObserver();
     }
 
-    private void setSongListObserver(){
+    private void setSongListObserver() {
         if (songListObserver != null) {
             listLiveDataSongs.removeObserver(songListObserver);
         }
@@ -260,13 +260,11 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
                 // Save to audioList
                 Song song = new Song(title, displayName, artist, album, data, year, lastDateModified, size);
-//                songList.add(song);
                 songViewModel.insert(song);
 
             }
         }
         cursor.close();
-//        adapter.submitList(songList);
     }
 
     private void setRecyclerView(View view) {
@@ -412,6 +410,8 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             mp.setDataSource(getActivity(), uri);
             mp.prepare();
         } catch (IOException e) {
+            songViewModel.delete(detectFromWhichList(currentSongClickedPosition));
+            nextBtnClicked();
             e.printStackTrace();
         }
         mp.setOnPreparedListener(this);
@@ -457,12 +457,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                     song.getArtist(), song.getData(), mp.getDuration()),
                     getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_MUSIC_PLAYER_TAG);
             constraintLayoutFound.setVisibility(View.GONE);
-
-//            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-//            transaction.replace(R.id.activity_display_songs_root_view, FragmentB.newInstance(), "fragment_b")
-//                    .addToBackStack(null)
-//                    .commit();
-//            setLayoutGone();
         }
     }
 
@@ -477,6 +471,8 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 mp.pause();
                 playBtn.setBackgroundResource(R.drawable.ic_play_button);
             }
+        } else if (songList != null && songList.size() != 0) {
+            onSongClick(0);
         }
     }
 
@@ -616,7 +612,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             fragment.getSongChanged();
         }
     }
-
 
 
 }
