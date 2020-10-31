@@ -189,7 +189,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     public void loadAudioFromTheDevice() {
         modelViewInstantiate();
-//        freeDateBase();
+        freeDateBase();
         getMusic();
     }
 
@@ -197,9 +197,9 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         Log.e(TAG, "freeDateBase: ");
         try {
             songViewModel.deleteAllSongs();
-            Log.e(TAG, "freeDateBase: try" );
+            Log.e(TAG, "freeDateBase: try");
         } catch (Exception e) {
-            Log.e(TAG, "freeDateBase: catch" );
+            Log.e(TAG, "freeDateBase: catch");
             e.getMessage();
         }
     }
@@ -276,9 +276,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 // Save to audioList
                 Song song = new Song(title, displayName, artist, album, data, year, lastDateModified, size, false);
 
-                if (!checkIfSongExists(data)) {
-                    songViewModel.insert(song);
-                }
+                songViewModel.insert(song);
 
             }
         }
@@ -286,14 +284,14 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 //        adapter.submitList(songList);
     }
 
-    boolean checkIfSongExists(String data) {
-        if (songList == null) return false;
-        for (Song song : songList) {
-            if (data.equals(song.getData()))
-                return true;
-        }
-        return false;
-    }
+//    boolean checkIfSongExists(String data) {
+//        if (songList == null) return false;
+//        for (Song song : songList) {
+//            if (data.equals(song.getData()))
+//                return true;
+//        }
+//        return false;
+//    }
 
     private void setRecyclerView(View view) {
         RecyclerView recyclerView = view.findViewById(R.id.fragment_display_songs_recycler_view);
@@ -419,7 +417,8 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     public void submitListChanges(int id) {
         songViewModel.delete(songList.get(mapBetweenSongListIndexAndFilteredArrayListIndex(id)));
-        if (filteredArrayList == null || filteredArrayList.size() == 0) adapter.submitList(filteredArrayList);
+        if (filteredArrayList == null || filteredArrayList.size() == 0)
+            adapter.submitList(filteredArrayList);
         else adapter.submitList(songList);
     }
 
