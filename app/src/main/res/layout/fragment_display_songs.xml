@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/main_color"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/textView2"
@@ -53,68 +53,61 @@
         android:clickable="true"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:visibility="gone">
+        android:visibility="visible">
 
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/fragment_display_songs_search_bar_constraintLayout"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@color/main_color"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/playlist"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <EditText
-                android:id="@+id/fragment_display_songs_ed_search_edit_text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/search_text_view_background"
-                android:drawablePadding="8dp"
-                android:ellipsize="end"
-                android:hint="@string/search_for_songs"
-                android:singleLine="true"
-                android:textAlignment="viewStart"
-                android:textColorHint="@android:color/tertiary_text_light"
-                android:textSize="16sp"
-                app:drawableStartCompat="@drawable/ic_search"
-                app:layout_constraintEnd_toStartOf="@+id/fragment_display_songs_btn_more_options"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
-                android:id="@+id/fragment_display_songs_btn_more_options"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="22dp"
-                android:background="@drawable/ic_more_horiz"
-                app:layout_constraintBottom_toBottomOf="@+id/fragment_display_songs_ed_search_edit_text"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/fragment_display_songs_ed_search_edit_text" />
+        <Button
+            android:id="@+id/fragment_display_songs_btn_more_options"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/ic_more_horiz"
+            app:layout_constraintBottom_toBottomOf="@+id/textView3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textView3" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="3dp"
-                android:layout_marginTop="8dp"
-                android:background="#2CAAAAAA"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/fragment_display_songs_btn_more_options"
-                app:layout_constraintStart_toStartOf="@+id/fragment_display_songs_ed_search_edit_text"
-                app:layout_constraintTop_toBottomOf="@+id/fragment_display_songs_ed_search_edit_text" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageView
+            android:id="@+id/fragment_display_songs_img_favourite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:src="@drawable/ic_favourite"
+            app:layout_constraintBottom_toBottomOf="@+id/fragment_display_songs_btn_more_options"
+            app:layout_constraintEnd_toStartOf="@+id/fragment_display_songs_btn_more_options"
+            app:layout_constraintTop_toTopOf="@+id/fragment_display_songs_btn_more_options" />
+
+        <ImageView
+            android:id="@+id/fragment_display_songs_img_refresh_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_refresh"
+            android:layout_marginEnd="32dp"
+            app:layout_constraintBottom_toBottomOf="@+id/fragment_display_songs_img_favourite"
+            app:layout_constraintEnd_toStartOf="@+id/fragment_display_songs_img_favourite"
+            app:layout_constraintTop_toTopOf="@+id/fragment_display_songs_img_favourite" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/fragment_display_songs_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintBottom_toTopOf="@+id/fragment_display_songs_constraint_layout_bottom_play_control"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fragment_display_songs_search_bar_constraintLayout"
+            app:layout_constraintTop_toBottomOf="@+id/textView3"
             tools:listitem="@layout/song_item" />
 
 

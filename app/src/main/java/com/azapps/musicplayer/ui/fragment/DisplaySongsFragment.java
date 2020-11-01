@@ -20,16 +20,16 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,8 +80,8 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     private static final String TAG = "DisplaySongsActivity";
     // ui
     private Button previousBtn, nextBtn, moreOptionsBtn;
+    private ImageView refreshImgView, favouriteImgView;
     private ImageButton playBtn;
-    private EditText searchEditText;
     private CircularImageView nowPlayingImageView;
     private TextView nowPlayingTextView, clickToLoadDataTv;
     private ConstraintLayout bottomControlConstraintLayout;
@@ -91,14 +91,11 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     // vars
     private ArrayList<Song> songList;
-    private ArrayList<Song> filteredArrayList;
     private SongAdapter adapter;
     private SongViewModel songViewModel;
     private LiveData<List<Song>> listLiveDataSongs;
     private Song song;
     private int currentSongClickedPosition = -1;
-    private int deletedSongPosition = -1;
-    private int deletedSongId = -1;
     private boolean isLooping = false, cameFromAudioFocus = false;
     private static int orderOfAudioFiles = ADDED_TIME_ORDER;
 
@@ -112,10 +109,9 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_display_songs, container, false);
         initViews(view);
-//        prepareMoreOptionImg();
         setRecyclerView(view);
         checkIfThePermissionIsGranted();
-//        scanForAddOrDeletedSongs();
+        runSearchFun();
         return view;
     }
 
@@ -123,8 +119,8 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         previousBtn = view.findViewById(R.id.fragment_display_songs_previous_btn);
         playBtn = view.findViewById(R.id.fragment_display_songs_play_btn);
         nextBtn = view.findViewById(R.id.fragment_display_songs_next_btn);
+        refreshImgView = view.findViewById(R.id.fragment_display_songs_img_refresh_data);
         moreOptionsBtn = view.findViewById(R.id.fragment_display_songs_btn_more_options);
-        searchEditText = view.findViewById(R.id.fragment_display_songs_ed_search_edit_text);
         nowPlayingImageView = view.findViewById(R.id.fragment_display_songs_now_playing_song_image_view);
         nowPlayingTextView = view.findViewById(R.id.fragment_display_songs_now_playing_song_title);
         bottomControlConstraintLayout = view.findViewById(R.id.fragment_display_songs_constraint_layout_bottom_play_control);
@@ -139,6 +135,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         previousBtn.setOnClickListener(this);
         playBtn.setOnClickListener(this);
         nextBtn.setOnClickListener(this);
+        refreshImgView.setOnClickListener(this);
         bottomControlConstraintLayout.setOnClickListener(this);
         moreOptionsBtn.setOnClickListener(this);
         clickToLoadDataTv.setOnClickListener(this);
@@ -159,7 +156,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         } else {
             // granted
             modelViewInstantiate();
-            initEditTextSearchFunction();
         }
     }
 
@@ -168,7 +164,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         if (requestCode == REQUEST_PERMISSION_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 modelViewInstantiate();
-                initEditTextSearchFunction();
             } else {
                 getActivity().finishAffinity();
             }
@@ -193,19 +188,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     public void loadAudioFromTheDevice() {
         modelViewInstantiate();
-//        freeDateBase();
         getMusic();
-    }
-
-    private void freeDateBase() {
-        Log.e(TAG, "freeDateBase: ");
-        try {
-            songViewModel.deleteAllSongs();
-            Log.e(TAG, "freeDateBase: try");
-        } catch (Exception e) {
-            Log.e(TAG, "freeDateBase: catch");
-            e.getMessage();
-        }
     }
 
     private void audioFilesWasFound() {
@@ -255,7 +238,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             } else {
                 audioFilesWasFound();
             }
-            scanForAddOrDeletedSongs();
         }
     };
 
@@ -284,14 +266,23 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             }
         }
         cursor.close();
-//        adapter.submitList(songList);
 
     }
 
-    private void scanForAddOrDeletedSongs(){
-                getMusic();
-                refreshSongs();
-                Log.e("TAG", "run: " );
+    private void runSearchFun() {
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                scanForAddOrDeletedSongs();
+            }
+        }, 4000);
+    }
+
+    private void scanForAddOrDeletedSongs() {
+        getMusic();
+        refreshSongs();
+        Log.e("TAG", "run: ");
     }
 
     boolean checkIfSongExists(String data) {
@@ -334,46 +325,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     }
 
     private Song detectFromWhichList(int position) {
-        Song song;
-        if (filteredArrayList == null || filteredArrayList.size() == 0) {
-            song = songList.get(position);
-        } else {
-            song = filteredArrayList.get(position);
-        }
-        return song;
-    }
-
-    private void initEditTextSearchFunction() {
-
-        searchEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                filterItems(s.toString());
-            }
-        });
-    }
-
-    private void filterItems(String text) {
-        filteredArrayList = new ArrayList<>();
-
-
-        for (Song song : songList) {
-            if (song.getTitle().toLowerCase().contains(text.toLowerCase())) {
-                filteredArrayList.add(song);
-            }
-        }
-
-        adapter.submitList(filteredArrayList);
+        return songList.get(position);
     }
 
     private void setImageToPlayerControl(String data) {
@@ -417,6 +369,9 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 constraintLayoutNotFound.setVisibility(View.GONE);
                 Utils.replaceFragments(SearchLocalStorageFragment.newInstance(), getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_SEARCH_LOCAL_STORAGE_TAG);
                 break;
+            case R.id.fragment_display_songs_img_refresh_data:
+                scanForAddOrDeletedSongs();
+                break;
         }
     }
 
@@ -429,31 +384,20 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     public void onSongMoreOptionClick(int position) {
         String path = "";
         Song deletedSong = detectFromWhichList(position);
-        deletedSongId = deletedSong.getId();
+//        deletedSongId = deletedSong.getId();
         if (song == null || !song.getData().equals(deletedSong.getData())) {
             path = deletedSong.getData();
         }
-        DeleteSongBottomSheetDialog deleteSongBottomSheetDialog = new DeleteSongBottomSheetDialog(path, deletedSongId);
+        DeleteSongBottomSheetDialog deleteSongBottomSheetDialog = new DeleteSongBottomSheetDialog(path, position);
         deleteSongBottomSheetDialog.show(getActivity().getSupportFragmentManager(), DELETE_BOTTOM_SHEET_TAG);
     }
 
-    public void submitListChanges(int id) {
-        Song temp_song = songList.get(mapBetweenSongListIndexAndFilteredArrayListIndex(id));
+    public void submitListChanges(int position) {
+        Song temp_song = songList.get(position);
         songViewModel.delete(temp_song);
         broadCastToMediaScanner(getActivity(), new File(temp_song.getData()));
-        if (filteredArrayList == null || filteredArrayList.size() == 0)
-            adapter.submitList(filteredArrayList);
-        else adapter.submitList(songList);
     }
 
-    private int mapBetweenSongListIndexAndFilteredArrayListIndex(int id) {
-        for (int i = 0; i < songList.size(); i++) {
-            if (songList.get(i).getId() == id) {
-                return i;
-            }
-        }
-        return -1;
-    }
 
     private void initMediaPlayer() {
         //isLooping = true;
@@ -527,7 +471,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     }
 
     private void controlBodyClicked() {
-        if (song!= null) {
+        if (song != null) {
             Utils.replaceFragments(MusicPlayerFragment.newInstance(song.getTitle(),
                     song.getArtist(), song.getData(), mp.getDuration()),
                     getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_MUSIC_PLAYER_TAG);
