@@ -65,7 +65,9 @@ import static com.azapps.musicplayer.pojo.Constant.ACTION_PLAY;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PREVIOUS;
 import static com.azapps.musicplayer.pojo.Constant.ADDED_TIME_ORDER;
 import static com.azapps.musicplayer.pojo.Constant.ALPHA_ORDER;
+import static com.azapps.musicplayer.pojo.Constant.CURRENT_SONG_IMAGE_DATA;
 import static com.azapps.musicplayer.pojo.Constant.CURRENT_SONG_POSITION;
+import static com.azapps.musicplayer.pojo.Constant.CURRENT_SONG_Title;
 import static com.azapps.musicplayer.pojo.Constant.DELETE_BOTTOM_SHEET_TAG;
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_MUSIC_PLAYER_TAG;
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_SEARCH_LOCAL_STORAGE_TAG;
@@ -115,6 +117,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         setRecyclerView(view);
         checkIfThePermissionIsGranted();
         runSearchFun(true);
+        getFromPreference();
         return view;
     }
 
@@ -233,7 +236,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             songList = new ArrayList<>();
             songList.addAll(songs);
             adapter.submitList(songs);
-            getFromPreference();
 
             SearchLocalStorageFragment fragment = (SearchLocalStorageFragment) getActivity().getSupportFragmentManager().findFragmentByTag(FRAGMENT_SEARCH_LOCAL_STORAGE_TAG);
             if ((fragment != null && fragment.isVisible())) {
@@ -277,20 +279,24 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     }
 
     private void runSearchFun(final boolean isFromOnCreate) {
-        if (currentSongClickedPosition != -1) {
-            final Handler handler = new Handler(Looper.getMainLooper());
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
+
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (currentSongClickedPosition != -1) {
                     scanForAddOrDeletedSongs(isFromOnCreate);
                 }
-            }, 4000);
-        }
+            }
+        }, 4000);
+
     }
 
     private void scanForAddOrDeletedSongs(boolean isFromOnCreate) {
         getMusic(isFromOnCreate);
         refreshSongs();
+        if (song != null)
+            findTheCorrectPosition(song.getData());
         Log.e("TAG", "run: ");
     }
 
@@ -305,11 +311,11 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     private void refreshSongs() {
         if (songList != null && songList.size() != 0) {
-            for (Song song : songList) {
-                File temp_file = new File(song.getData());
+            for (Song temp_song : songList) {
+                File temp_file = new File(temp_song.getData());
                 if (!temp_file.exists()) {
                     broadCastToMediaScanner(getActivity(), temp_file);
-                    songViewModel.delete(song);
+                    songViewModel.delete(temp_song);
                 }
             }
         }
@@ -327,15 +333,12 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     @Override
     public void onSongClick(int position) {
         currentSongClickedPosition = position;
-        song = detectFromWhichList(position);
+        song = songList.get(position);
         if (checkOnAudioFocus()) {
             playMusic(song);
         }
     }
 
-    private Song detectFromWhichList(int position) {
-        return songList.get(position);
-    }
 
     private void setImageToPlayerControl(String data) {
         try {
@@ -392,8 +395,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     @Override
     public void onSongMoreOptionClick(int position) {
         String path = "";
-        Song deletedSong = detectFromWhichList(position);
-//        deletedSongId = deletedSong.getId();
+        Song deletedSong = songList.get(position);
         if (song == null || !song.getData().equals(deletedSong.getData())) {
             path = deletedSong.getData();
         }
@@ -404,7 +406,18 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     public void submitListChanges(int position) {
         Song temp_song = songList.get(position);
         songViewModel.delete(temp_song);
+        findTheCorrectPosition(song.getData());
         broadCastToMediaScanner(getActivity(), new File(temp_song.getData()));
+    }
+
+    private void findTheCorrectPosition(String data) {
+        for (int i = 0; i < songList.size(); i++) {
+            Song temp = songList.get(i);
+            if (temp.getData().equals(data)) {
+                currentSongClickedPosition = i;
+                song = temp;
+            }
+        }
     }
 
 
@@ -433,7 +446,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         } catch (IOException e) {
             Toast.makeText(getActivity(), "This Audio does not exist anymore", Toast.LENGTH_SHORT).show();
             broadCastToMediaScanner(getActivity(), new File(songData));
-            songViewModel.delete(detectFromWhichList(currentSongClickedPosition));
+            songViewModel.delete(songList.get(currentSongClickedPosition));
             nextBtnClicked();
             e.printStackTrace();
         }
@@ -491,12 +504,15 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             startMyService();
             if (!mp.isPlaying() && currentSongClickedPosition != -1) {
                 mp.start();
+                Log.e(TAG, "playBtnClicked: start");
                 mp.setOnCompletionListener(this);
                 playBtn.setImageResource(R.drawable.ic_pause);
             } else {
                 mp.pause();
                 playBtn.setImageResource(R.drawable.ic_play_button);
             }
+        } else if (currentSongClickedPosition != -1) {
+            onSongClick(currentSongClickedPosition);
         } else {
             onSongClick(0);
         }
@@ -593,32 +609,20 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     private void saveToPreference() {
         SharedPreferences.Editor editor = getActivity().getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE).edit();
         editor.putInt(CURRENT_SONG_POSITION, currentSongClickedPosition);
+        editor.putString(CURRENT_SONG_IMAGE_DATA, song.getData());
+        editor.putString(CURRENT_SONG_Title, song.getTitle());
         editor.apply();
     }
 
     private void getFromPreference() {
         SharedPreferences preferences = getActivity().getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
         currentSongClickedPosition = preferences.getInt(CURRENT_SONG_POSITION, -1);
-        if (currentSongClickedPosition != -1) {
-            initPlayerWhenStart(currentSongClickedPosition);
-        }
+        String data = preferences.getString(CURRENT_SONG_IMAGE_DATA, "");
+        String title = preferences.getString(CURRENT_SONG_Title, getString(R.string.choose_a_song));
+        if (data.equals("")) nowPlayingImageView.setImageResource(R.drawable.default_image);
+        else setImageToPlayerControl(data);
+        nowPlayingTextView.setText(title);
         Log.e(TAG, "getFromPreference: " + currentSongClickedPosition);
-    }
-
-    private void initPlayerWhenStart(int position){
-        try {
-            song = songList.get(position);
-            String data = song.getData();
-            setImageToPlayerControl(data);
-            setTitleToPlayerControl(song.getTitle());
-            initMediaPlayer();
-            mp.setDataSource(getActivity(), Uri.parse(data));
-            mp.prepare();
-
-        }catch (Exception e){
-            nowPlayingTextView.setText(getString(R.string.choose_a_song));
-            nowPlayingImageView.setImageResource(R.drawable.default_image);
-        }
     }
 
     public void releaseMediaPlayer() {

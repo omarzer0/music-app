@@ -24,4 +24,6 @@ public class Constant {
     public static final int REQUEST_PERMISSION_STORAGE = 1000;
     public static final String MY_PREFS_NAME = "shared preference file";
     public static final String CURRENT_SONG_POSITION = "current song position";
+    public static final String CURRENT_SONG_IMAGE_DATA="CURRENT_SONG_IMAGE_DATA";
+    public static final String CURRENT_SONG_Title="CURRENT_SONG_Title";
 }
