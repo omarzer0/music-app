@@ -22,4 +22,6 @@ public class Constant {
     public static final int ADDED_TIME_ORDER = 1;
     public static final int ALPHA_ORDER = 2;
     public static final int REQUEST_PERMISSION_STORAGE = 1000;
+    public static final String MY_PREFS_NAME = "shared preference file";
+    public static final String CURRENT_SONG_POSITION = "current song position";
 }

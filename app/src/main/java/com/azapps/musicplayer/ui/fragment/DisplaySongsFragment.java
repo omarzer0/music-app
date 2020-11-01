@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -64,11 +65,13 @@ import static com.azapps.musicplayer.pojo.Constant.ACTION_PLAY;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PREVIOUS;
 import static com.azapps.musicplayer.pojo.Constant.ADDED_TIME_ORDER;
 import static com.azapps.musicplayer.pojo.Constant.ALPHA_ORDER;
+import static com.azapps.musicplayer.pojo.Constant.CURRENT_SONG_POSITION;
 import static com.azapps.musicplayer.pojo.Constant.DELETE_BOTTOM_SHEET_TAG;
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_MUSIC_PLAYER_TAG;
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_SEARCH_LOCAL_STORAGE_TAG;
 import static com.azapps.musicplayer.pojo.Constant.MORE_BOTTOM_SHEET_TAG;
 import static com.azapps.musicplayer.pojo.Constant.MUSIC_BROADCAST_SEND_INTENT;
+import static com.azapps.musicplayer.pojo.Constant.MY_PREFS_NAME;
 import static com.azapps.musicplayer.pojo.Constant.REQUEST_PERMISSION_STORAGE;
 import static com.azapps.musicplayer.pojo.Constant.SEND_IS_PLAYING_BOOLEAN_EXTRA;
 import static com.azapps.musicplayer.pojo.Constant.SEND_SONG_DATA_STRING_EXTRA;
@@ -111,7 +114,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         initViews(view);
         setRecyclerView(view);
         checkIfThePermissionIsGranted();
-        runSearchFun();
+        runSearchFun(true);
         return view;
     }
 
@@ -188,7 +191,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     public void loadAudioFromTheDevice() {
         modelViewInstantiate();
-        getMusic();
+        getMusic(true);
     }
 
     private void audioFilesWasFound() {
@@ -230,6 +233,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             songList = new ArrayList<>();
             songList.addAll(songs);
             adapter.submitList(songs);
+            getFromPreference();
 
             SearchLocalStorageFragment fragment = (SearchLocalStorageFragment) getActivity().getSupportFragmentManager().findFragmentByTag(FRAGMENT_SEARCH_LOCAL_STORAGE_TAG);
             if ((fragment != null && fragment.isVisible())) {
@@ -241,12 +245,13 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         }
     };
 
-    private void getMusic() {
+    private void getMusic(boolean isFromOnCreate) {
         ContentResolver contentResolver = getActivity().getContentResolver();
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
         String sortOrder = MediaStore.Audio.Media.TITLE + " DESC";
         Cursor cursor = contentResolver.query(uri, null, selection, null, sortOrder);
+        int counter = 0;
         if (cursor != null && cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
                 String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
@@ -262,25 +267,29 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 if (!checkIfSongExists(data)) {
                     Song song = new Song(title, displayName, artist, album, data, year, lastDateModified, size, false);
                     songViewModel.insert(song);
+                    counter++;
                 }
             }
         }
         cursor.close();
-
+        if (!isFromOnCreate)
+            Toast.makeText(getActivity(), counter + " Songs is added", Toast.LENGTH_SHORT).show();
     }
 
-    private void runSearchFun() {
-        final Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                scanForAddOrDeletedSongs();
-            }
-        }, 4000);
+    private void runSearchFun(final boolean isFromOnCreate) {
+        if (currentSongClickedPosition != -1) {
+            final Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    scanForAddOrDeletedSongs(isFromOnCreate);
+                }
+            }, 4000);
+        }
     }
 
-    private void scanForAddOrDeletedSongs() {
-        getMusic();
+    private void scanForAddOrDeletedSongs(boolean isFromOnCreate) {
+        getMusic(isFromOnCreate);
         refreshSongs();
         Log.e("TAG", "run: ");
     }
@@ -370,7 +379,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 Utils.replaceFragments(SearchLocalStorageFragment.newInstance(), getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_SEARCH_LOCAL_STORAGE_TAG);
                 break;
             case R.id.fragment_display_songs_img_refresh_data:
-                scanForAddOrDeletedSongs();
+                scanForAddOrDeletedSongs(false);
                 break;
         }
     }
@@ -421,10 +430,8 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         try {
             mp.setDataSource(getActivity(), uri);
             mp.prepare();
-            Log.e("TAG", "playMusic: " + song.getData() + "\n" + uri.toString());
         } catch (IOException e) {
             Toast.makeText(getActivity(), "This Audio does not exist anymore", Toast.LENGTH_SHORT).show();
-            Log.e("TAG", "playMusic: " + song.getData() + "\n" + uri.toString());
             broadCastToMediaScanner(getActivity(), new File(songData));
             songViewModel.delete(detectFromWhichList(currentSongClickedPosition));
             nextBtnClicked();
@@ -580,6 +587,38 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         getActivity().unregisterReceiver(broadcastReceiver);
         Intent serviceIntent = new Intent(getActivity(), MusicService.class);
         getActivity().stopService(serviceIntent);
+        saveToPreference();
+    }
+
+    private void saveToPreference() {
+        SharedPreferences.Editor editor = getActivity().getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE).edit();
+        editor.putInt(CURRENT_SONG_POSITION, currentSongClickedPosition);
+        editor.apply();
+    }
+
+    private void getFromPreference() {
+        SharedPreferences preferences = getActivity().getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
+        currentSongClickedPosition = preferences.getInt(CURRENT_SONG_POSITION, -1);
+        if (currentSongClickedPosition != -1) {
+            initPlayerWhenStart(currentSongClickedPosition);
+        }
+        Log.e(TAG, "getFromPreference: " + currentSongClickedPosition);
+    }
+
+    private void initPlayerWhenStart(int position){
+        try {
+            song = songList.get(position);
+            String data = song.getData();
+            setImageToPlayerControl(data);
+            setTitleToPlayerControl(song.getTitle());
+            initMediaPlayer();
+            mp.setDataSource(getActivity(), Uri.parse(data));
+            mp.prepare();
+
+        }catch (Exception e){
+            nowPlayingTextView.setText(getString(R.string.choose_a_song));
+            nowPlayingImageView.setImageResource(R.drawable.default_image);
+        }
     }
 
     public void releaseMediaPlayer() {
@@ -634,6 +673,5 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             fragment.getSongChanged();
         }
     }
-
 
 }
