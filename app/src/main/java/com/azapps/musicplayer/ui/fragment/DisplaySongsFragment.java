@@ -30,7 +30,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +53,7 @@ import com.azapps.musicplayer.pojo.Utils;
 import com.azapps.musicplayer.service.MusicService;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +99,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     private int currentSongClickedPosition = -1;
     private int deletedSongPosition = -1;
     private int deletedSongId = -1;
-    private boolean isLooping = false;
+    private boolean isLooping = false, cameFromAudioFocus = false;
     private static int orderOfAudioFiles = ADDED_TIME_ORDER;
 
     public static Fragment newInstance() {
@@ -115,6 +115,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 //        prepareMoreOptionImg();
         setRecyclerView(view);
         checkIfThePermissionIsGranted();
+//        scanForAddOrDeletedSongs();
         return view;
     }
 
@@ -192,7 +193,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     public void loadAudioFromTheDevice() {
         modelViewInstantiate();
-        freeDateBase();
+//        freeDateBase();
         getMusic();
     }
 
@@ -209,7 +210,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     private void audioFilesWasFound() {
         if (songList.size() > 0) {
-            Log.e(TAG, "audioFilesWasFound: full");
             constraintLayoutFound.setVisibility(View.VISIBLE);
             constraintLayoutNotFound.setVisibility(View.GONE);
         }
@@ -255,6 +255,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             } else {
                 audioFilesWasFound();
             }
+            scanForAddOrDeletedSongs();
         }
     };
 
@@ -264,37 +265,55 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
         String sortOrder = MediaStore.Audio.Media.TITLE + " DESC";
         Cursor cursor = contentResolver.query(uri, null, selection, null, sortOrder);
-
         if (cursor != null && cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
                 String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                 String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
                 String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                 long lastDateModified = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED));
-
                 String displayName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
                 String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
                 String year = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.YEAR));
                 long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
                 // Save to audioList
-                Song song = new Song(title, displayName, artist, album, data, year, lastDateModified, size, false);
 
-                songViewModel.insert(song);
-
+                if (!checkIfSongExists(data)) {
+                    Song song = new Song(title, displayName, artist, album, data, year, lastDateModified, size, false);
+                    songViewModel.insert(song);
+                }
             }
         }
         cursor.close();
 //        adapter.submitList(songList);
+
     }
 
-//    boolean checkIfSongExists(String data) {
-//        if (songList == null) return false;
-//        for (Song song : songList) {
-//            if (data.equals(song.getData()))
-//                return true;
-//        }
-//        return false;
-//    }
+    private void scanForAddOrDeletedSongs(){
+                getMusic();
+                refreshSongs();
+                Log.e("TAG", "run: " );
+    }
+
+    boolean checkIfSongExists(String data) {
+        if (songList == null) return false;
+        for (Song song : songList) {
+            if (data.equals(song.getData()))
+                return true;
+        }
+        return false;
+    }
+
+    private void refreshSongs() {
+        if (songList != null && songList.size() != 0) {
+            for (Song song : songList) {
+                File temp_file = new File(song.getData());
+                if (!temp_file.exists()) {
+                    broadCastToMediaScanner(getActivity(), temp_file);
+                    songViewModel.delete(song);
+                }
+            }
+        }
+    }
 
     private void setRecyclerView(View view) {
         RecyclerView recyclerView = view.findViewById(R.id.fragment_display_songs_recycler_view);
@@ -419,7 +438,9 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     }
 
     public void submitListChanges(int id) {
-        songViewModel.delete(songList.get(mapBetweenSongListIndexAndFilteredArrayListIndex(id)));
+        Song temp_song = songList.get(mapBetweenSongListIndexAndFilteredArrayListIndex(id));
+        songViewModel.delete(temp_song);
+        broadCastToMediaScanner(getActivity(), new File(temp_song.getData()));
         if (filteredArrayList == null || filteredArrayList.size() == 0)
             adapter.submitList(filteredArrayList);
         else adapter.submitList(songList);
@@ -456,8 +477,11 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         try {
             mp.setDataSource(getActivity(), uri);
             mp.prepare();
+            Log.e("TAG", "playMusic: " + song.getData() + "\n" + uri.toString());
         } catch (IOException e) {
             Toast.makeText(getActivity(), "This Audio does not exist anymore", Toast.LENGTH_SHORT).show();
+            Log.e("TAG", "playMusic: " + song.getData() + "\n" + uri.toString());
+            broadCastToMediaScanner(getActivity(), new File(songData));
             songViewModel.delete(detectFromWhichList(currentSongClickedPosition));
             nextBtnClicked();
             e.printStackTrace();
@@ -465,6 +489,12 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         mp.setOnPreparedListener(this);
     }
 
+    public static void broadCastToMediaScanner(Context context, File file) {
+        Uri contentUri = Uri.fromFile(file);
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        mediaScanIntent.setData(contentUri);
+        context.sendBroadcast(mediaScanIntent);
+    }
 
     public void nextBtnClicked() {
         if (mp != null) {
@@ -497,10 +527,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     }
 
     private void controlBodyClicked() {
-        if (currentSongClickedPosition != -1) {
-            Song song = detectFromWhichList(currentSongClickedPosition);
-
-
+        if (song!= null) {
             Utils.replaceFragments(MusicPlayerFragment.newInstance(song.getTitle(),
                     song.getArtist(), song.getData(), mp.getDuration()),
                     getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_MUSIC_PLAYER_TAG);
@@ -515,16 +542,14 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 mp.start();
                 mp.setOnCompletionListener(this);
                 playBtn.setImageResource(R.drawable.ic_pause);
-                Log.e(TAG, "playBtnClicked: " + currentSongClickedPosition);
             } else {
                 mp.pause();
                 playBtn.setImageResource(R.drawable.ic_play_button);
-                Log.e(TAG, "playBtnClicked: " + currentSongClickedPosition);
             }
         } else {
             onSongClick(0);
-            Log.e(TAG, "playBtnClicked: " + currentSongClickedPosition);
         }
+        Log.e(TAG, "playBtnClicked: " + currentSongClickedPosition);
     }
 
     public void startMyService() {
@@ -631,15 +656,17 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     @Override
     public void onAudioFocusChange(int focusChange) {
         MusicPlayerFragment fragment = (MusicPlayerFragment) getActivity().getSupportFragmentManager().findFragmentByTag(FRAGMENT_MUSIC_PLAYER_TAG);
-        if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+        if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT && mp.isPlaying()) {
             playBtnClicked();
+            cameFromAudioFocus = true;
         } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
             playBtnClicked();
             releaseMediaPlayer();
         } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
             playBtnClicked();
-        } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+        } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN && cameFromAudioFocus) {
             playBtnClicked();
+            cameFromAudioFocus = false;
         }
         if (fragment != null && fragment.isVisible()) {
             fragment.play();

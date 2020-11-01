@@ -18,4 +18,5 @@
     <string name="ok">تم</string>
     <string name="music_player">مشغل الصوتيات</string>
     <string name="delete">حذف</string>
+    <string name="go_back">العودة</string>
 </resources>

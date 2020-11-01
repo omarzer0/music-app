@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1A2028">
+    android:background="@color/main_color">
 
     <!--    <ImageView-->
     <!--        android:id="@+id/fragment_music_player_song_img_cover"-->

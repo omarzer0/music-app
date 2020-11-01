@@ -25,7 +25,7 @@ public class MusicNotification {
 
     public static NotificationCompat.Builder createNotificationCompat(Context context, boolean isPlaying, String title, String imageData) {
         Intent notificationIntent = new Intent(context, HomeActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
         Intent broadcastIntentPrevious = new Intent(context, MusicBroadcast.class);
         broadcastIntentPrevious.setAction(ACTION_PREVIOUS);
@@ -77,7 +77,7 @@ public class MusicNotification {
 
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setContentTitle("Music Service")
-                .setSmallIcon(R.drawable.ic_launcher_background);
+                .setSmallIcon(R.mipmap.ic_launcher_foreground);
 //                .setContentIntent(pendingIntent);
 
         return builder;

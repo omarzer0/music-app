@@ -18,4 +18,5 @@
     <string name="ok">Ok</string>
     <string name="music_player">Music Player</string>
     <string name="delete">delete</string>
+    <string name="go_back">go back</string>
 </resources>

@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_display_songs_root_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/fragment_display_songs_root_not_found"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+        android:background="@color/main_color"
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/textView2"
@@ -20,7 +20,7 @@
             android:layout_marginBottom="40dp"
             android:drawablePadding="8dp"
             android:text="@string/no_audio_was_found"
-            android:textColor="#000"
+            android:textColor="#fff"
             android:textSize="16sp"
             android:textStyle="bold"
             app:drawableStartCompat="@drawable/ic_sad"
@@ -49,11 +49,11 @@
         android:id="@+id/fragment_display_songs_root_constraint_found"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/main_color"
         android:clickable="true"
         android:focusable="true"
-        android:background="#1A2028"
         android:focusableInTouchMode="true"
-        android:visibility="visible">
+        android:visibility="gone">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -61,7 +61,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:background="#1A2028"
+            android:background="@color/main_color"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -121,7 +121,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/fragment_display_songs_constraint_layout_bottom_play_control"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="60dp"
             android:background="@drawable/shape"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -135,11 +135,11 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:scaleType="centerCrop"
-                app:civ_border="true"
-                app:civ_border_width="2dp"
-                app:civ_border_color_start="#FF6200EE"
-                app:civ_border_color="#EE0014"
                 android:src="@drawable/default_image"
+                app:civ_border="true"
+                app:civ_border_color="#EE0014"
+                app:civ_border_color_start="#FF6200EE"
+                app:civ_border_width="2dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -170,11 +170,11 @@
                     android:id="@+id/fragment_display_songs_play_btn"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
+                    android:background="@drawable/button_shape"
                     android:layoutDirection="ltr"
                     android:padding="8dp"
-                    android:src="@drawable/ic_play_button"
                     android:scaleType="centerInside"
-                    android:background="@drawable/button_shape"
+                    android:src="@drawable/ic_play_button"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/fragment_display_songs_next_btn"
                     app:layout_constraintTop_toTopOf="parent" />

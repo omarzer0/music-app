@@ -2,15 +2,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
-    android:layoutDirection="ltr">
+    android:layout_height="88dp"
+    android:layoutDirection="ltr"
+    android:background="@color/main_color">
 
     <ImageView
         android:id="@+id/logo"
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:scaleType="centerCrop"
         android:src="@mipmap/ic_launcher" />
@@ -18,23 +19,22 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_toStartOf="@id/logo"
         android:text="@string/music_player"
-        android:textColor="#000"
+        android:textColor="#fff"
         android:textSize="12sp" />
 
     <ImageView
         android:id="@+id/notification_collapsed_song_image_image_view"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_alignTop="@id/logo"
+        android:background="#fff"
         android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_marginTop="24dp"
+        android:layout_alignParentBottom="true"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:scaleType="centerCrop"
         tools:src="@drawable/default_image" />
 
@@ -45,13 +45,13 @@
         android:layout_alignParentBottom="true"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="24dp"
         android:layout_toStartOf="@id/notification_collapsed_song_image_image_view"
         android:layout_toEndOf="@id/notification_collapsed_controller_view"
         android:ellipsize="end"
         android:singleLine="true"
         android:textAlignment="viewEnd"
-        android:textColor="#000"
+        android:textColor="#fff"
         android:textSize="16sp"
         android:textStyle="bold"
         tools:text="This is a Title" />
@@ -62,7 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="12dp">
+        android:layout_marginBottom="16dp">
 
         <ImageView
             android:id="@+id/notification_collapsed_previous_btn"
