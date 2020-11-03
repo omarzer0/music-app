@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,11 +12,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -263,11 +261,15 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 String displayName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
                 String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
                 String year = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.YEAR));
-                long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
+//                long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
+                long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+                Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, size);
+                String cover = albumArtUri.toString();
                 // Save to audioList
 
                 if (!checkIfSongExists(data)) {
-                    Song song = new Song(title, displayName, artist, album, data, year, lastDateModified, size, false);
+                    Song song = new Song(title, displayName, artist, album, data, year, lastDateModified, size, false, cover);
                     songViewModel.insert(song);
                     counter++;
                 }
@@ -288,7 +290,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                     scanForAddOrDeletedSongs(isFromOnCreate);
                 }
             }
-        }, 4000);
+        }, 1000);
 
     }
 
@@ -326,7 +328,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.hasFixedSize();
         recyclerView.setItemAnimator(null);
-        adapter = new SongAdapter(this);
+        adapter = new SongAdapter(this, getActivity());
         recyclerView.setAdapter(adapter);
     }
 
@@ -340,19 +342,11 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     }
 
 
-    private void setImageToPlayerControl(String data) {
-        try {
-            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(data);
-            byte[] coverBytes = retriever.getEmbeddedPicture();
-            Bitmap songCover;
-
-            songCover = BitmapFactory.decodeByteArray(coverBytes, 0, coverBytes.length);
-            nowPlayingImageView.setImageBitmap(songCover);
-        } catch (Exception e) {
-            e.getMessage();
+    private void setImageToPlayerControl(String cover) {
+        Uri uri = Uri.parse(cover);
+        nowPlayingImageView.setImageURI(uri);
+        if (nowPlayingImageView.getDrawable() == null)
             nowPlayingImageView.setImageResource(R.drawable.default_image);
-        }
     }
 
     private void setTitleToPlayerControl(String songTitle) {
@@ -409,20 +403,24 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         try {
             String data = song.getData();
             findTheCorrectPosition(data);
-        }catch (NullPointerException e){
-            Log.e(TAG, "submitListChanges: "+e.getMessage() );
+        } catch (NullPointerException e) {
+            Log.e(TAG, "submitListChanges: " + e.getMessage());
         }
         broadCastToMediaScanner(getActivity(), new File(temp_song.getData()));
         currentSongClickedPosition--;
     }
 
     private void findTheCorrectPosition(String data) {
-        for (int i = 0; i < songList.size(); i++) {
-            Song temp = songList.get(i);
-            if (temp.getData().equals(data)) {
-                currentSongClickedPosition = i;
-                song = temp;
+        try {
+            for (int i = 0; i < songList.size(); i++) {
+                Song temp = songList.get(i);
+                if (temp.getData().equals(data)) {
+                    currentSongClickedPosition = i;
+                    song = temp;
+                }
             }
+        } catch (Exception e) {
+            e.getMessage();
         }
     }
 
@@ -442,7 +440,8 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         releaseMediaPlayer();
         String songData = song.getData();
         String songTitle = song.getTitle();
-        setImageToPlayerControl(songData);
+        String cover = song.getCover();
+        setImageToPlayerControl(cover);
         setTitleToPlayerControl(songTitle);
         Uri uri = Uri.parse(songData);
         initMediaPlayer();
@@ -499,7 +498,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     private void controlBodyClicked() {
         if (song != null) {
             Utils.replaceFragments(MusicPlayerFragment.newInstance(song.getTitle(),
-                    song.getArtist(), song.getData(), mp.getDuration()),
+                    song.getArtist(), song.getData(), mp.getDuration(), song.getCover()),
                     getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_MUSIC_PLAYER_TAG);
             constraintLayoutFound.setVisibility(View.GONE);
         }
@@ -563,6 +562,10 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         return mp.getDuration();
     }
 
+    public String getSongCover() {
+        return song.getCover();
+    }
+
     public int getOrderOfAudioFiles() {
         return orderOfAudioFiles;
     }
@@ -615,19 +618,19 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     private void saveToPreference() {
         SharedPreferences.Editor editor = getActivity().getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE).edit();
         editor.putInt(CURRENT_SONG_POSITION, currentSongClickedPosition);
-        editor.putString(CURRENT_SONG_IMAGE_DATA, song.getData());
+        editor.putString(CURRENT_SONG_IMAGE_DATA, song.getCover());
         editor.putString(CURRENT_SONG_Title, song.getTitle());
-        Log.e(TAG, ""+song.getData() );
+        Log.e(TAG, "" + song.getData());
         editor.apply();
     }
 
     private void getFromPreference() {
         SharedPreferences preferences = getActivity().getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
         currentSongClickedPosition = preferences.getInt(CURRENT_SONG_POSITION, -1);
-        String data = preferences.getString(CURRENT_SONG_IMAGE_DATA, "");
+        String cover = preferences.getString(CURRENT_SONG_IMAGE_DATA, "");
         String title = preferences.getString(CURRENT_SONG_Title, getString(R.string.choose_a_song));
-        if (data.equals("")) nowPlayingImageView.setImageResource(R.drawable.default_image);
-        else setImageToPlayerControl(data);
+        if (cover.equals("")) nowPlayingImageView.setImageResource(R.drawable.default_image);
+        else setImageToPlayerControl(cover);
         nowPlayingTextView.setText(title);
         Log.e(TAG, "getFromPreference: " + currentSongClickedPosition);
     }
@@ -653,18 +656,18 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT && mp.isPlaying()) {
             playBtnClicked();
             cameFromAudioFocus = true;
-            Log.e("TAG", "onAudioFocusChange: AUDIOFOCUS_LOSS_TRANSIENT" );
+            Log.e("TAG", "onAudioFocusChange: AUDIOFOCUS_LOSS_TRANSIENT");
         } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
             playBtnClicked();
             releaseMediaPlayer();
-            Log.e("TAG", "onAudioFocusChange: AUDIOFOCUS_LOSS" );
+            Log.e("TAG", "onAudioFocusChange: AUDIOFOCUS_LOSS");
         } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
             playBtnClicked();
-            Log.e("TAG", "onAudioFocusChange: AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK" );
+            Log.e("TAG", "onAudioFocusChange: AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK");
         } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN && cameFromAudioFocus) {
             playBtnClicked();
             cameFromAudioFocus = false;
-            Log.e("TAG", "onAudioFocusChange: AUDIOFOCUS_GAIN" );
+            Log.e("TAG", "onAudioFocusChange: AUDIOFOCUS_GAIN");
         }
         if (fragment != null && fragment.isVisible()) {
             fragment.play();

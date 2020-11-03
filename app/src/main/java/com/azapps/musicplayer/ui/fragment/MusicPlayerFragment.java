@@ -4,9 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -39,6 +37,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     private static final String ARTIST_EXTRA = "artist";
     private static final String DATA_EXTRA = "data";
     private static final String TOTAL_TIME_EXTRA = "total time";
+    private static final String SONG_COVER_EXTRA = "song cover extra";
 
     private CircularImageView songCoverImage;
     private Button nextBtn, previousBtn;
@@ -55,17 +54,19 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     private String songData;
     private String songArtist;
     private int totalTime;
+    private String cover;
 
     public MusicPlayerFragment() {
     }
 
-    public static Fragment newInstance(String title, String artist, String data, int duration) {
+    public static Fragment newInstance(String title, String artist, String data, int duration, String cover) {
         MusicPlayerFragment fragment = new MusicPlayerFragment();
         Bundle args = new Bundle();
         args.putString(TITLE_EXTRA, title);
         args.putString(ARTIST_EXTRA, artist);
         args.putString(DATA_EXTRA, data);
         args.putInt(TOTAL_TIME_EXTRA, duration);
+        args.putString(SONG_COVER_EXTRA, cover);
         fragment.setArguments(args);
         return fragment;
     }
@@ -80,6 +81,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
             songArtist = getArguments().getString(ARTIST_EXTRA);
             songData = getArguments().getString(DATA_EXTRA);
             totalTime = getArguments().getInt(TOTAL_TIME_EXTRA);
+            cover = getArguments().getString(SONG_COVER_EXTRA);
         }
     }
 
@@ -128,7 +130,6 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     private void prepareAndListenToPositionSeekBarChanges() {
         // position Bar
         positionSeekBar.setMax(totalTime);
-//        positionSeekBar.setPadding(0, 0, 0, 0);
         positionSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -167,20 +168,10 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     }
 
     private void getSongExtra() {
-        try {
-//            String data = song.getData();
-            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(songData);
-            Log.e("TAG", songData );
-            byte[] coverBytes = retriever.getEmbeddedPicture();
-            Bitmap songCover;
-
-            songCover = BitmapFactory.decodeByteArray(coverBytes, 0, coverBytes.length);
-            songCoverImage.setImageBitmap(songCover);
-        } catch (Exception e) {
-            e.getMessage();
+        Uri uri = Uri.parse(cover);
+        songCoverImage.setImageURI(uri);
+        if (songCoverImage.getDrawable() == null)
             songCoverImage.setImageResource(R.drawable.default_image);
-        }
     }
 
     private String createTimeLabel(int time) {
@@ -278,6 +269,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         songTitle = ((HomeActivity) getActivity()).getSongTitle();
         songArtist = ((HomeActivity) getActivity()).getSongArtist();
         totalTime = ((HomeActivity) getActivity()).getSongTotalTime();
+        cover = ((HomeActivity) getActivity()).getSongCover();
         getSongExtra();
         setTotalTimeLabel_TimeElapsed_SongTitleAndSongArtist();
     }

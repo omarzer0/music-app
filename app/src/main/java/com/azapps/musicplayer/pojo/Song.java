@@ -4,8 +4,6 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import java.io.Serializable;
-
 @Entity(tableName = "song_table")
 //TODO: remember>>> change Serializable to Parcelable later
 public class Song  {
@@ -20,10 +18,11 @@ public class Song  {
     private long lastModifyDate;
     private long size;
     private boolean isFavourite;
+    private String cover;
 
 
     @Ignore
-    public Song(String title, String displayName, String artist, String album, String data, String year, long lastModifyDate, long size,boolean isFavourite) {
+    public Song(String title, String displayName, String artist, String album, String data, String year, long lastModifyDate, long size, boolean isFavourite, String cover) {
         this.title = checkIfEmpty(title);
         this.displayName = checkIfEmpty(displayName);
         this.artist = checkIfEmpty(artist);
@@ -33,9 +32,10 @@ public class Song  {
         this.size = size;
         this.lastModifyDate = lastModifyDate;
         this.isFavourite = isFavourite;
+        this.cover = cover;
     }
 
-    public Song(int id, String title, String displayName, String artist, String album, String data, String year, long lastModifyDate, long size, boolean isFavourite) {
+    public Song(int id, String title, String displayName, String artist, String album, String data, String year, long lastModifyDate, long size, boolean isFavourite, String cover) {
         this.id = id;
         this.title = checkIfEmpty(title);
         this.displayName = checkIfEmpty(displayName);
@@ -46,6 +46,15 @@ public class Song  {
         this.size = size;
         this.lastModifyDate = lastModifyDate;
         this.isFavourite = isFavourite;
+        this.cover = cover;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     public long getLastModifyDate() {

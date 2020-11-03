@@ -8,6 +8,21 @@
     android:layout_marginTop="8dp"
     android:layout_marginBottom="16dp">
 
+    <com.mikhaellopez.circularimageview.CircularImageView
+        android:id="@+id/song_item_img_song_image"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:scaleType="centerCrop"
+        app:civ_border="true"
+        app:civ_border_color="#EE0014"
+        app:civ_border_color_start="#FF6200EE"
+        app:civ_border_width="1dp"
+        tools:src="@drawable/default_image"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/song_item_tv_title"
         style="@style/TextStopTitle"
@@ -20,7 +35,7 @@
         android:textAlignment="viewStart"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintEnd_toStartOf="@+id/song_item_img_more"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/song_item_img_song_image"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="This is The Title" />
 
@@ -32,9 +47,9 @@
         android:ellipsize="end"
         android:singleLine="true"
         android:textAlignment="viewStart"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/song_item_tv_title"
         app:layout_constraintStart_toStartOf="@+id/song_item_tv_title"
-        app:layout_constraintTop_toBottomOf="@+id/song_item_tv_title"
         tools:text="this is the artist" />
 
 

@@ -106,4 +106,9 @@ public class HomeActivity extends AppCompatActivity {
         getDisplaySongFragmentInstance();
         displaySongsFragment.submitListChanges(position);
     }
+
+    public String getSongCover() {
+        getDisplaySongFragmentInstance();
+        return displaySongsFragment.getSongCover();
+    }
 }
