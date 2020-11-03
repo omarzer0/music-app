@@ -84,14 +84,11 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="32dp"
-            android:background="@drawable/ic_favourite"
-            android:src="@drawable/default_image"
+            android:src="@drawable/ic_favourite"
             android:scaleType="center"
-            android:backgroundTint="#ff0000"
             app:layout_constraintBottom_toBottomOf="@+id/fragment_display_songs_btn_more_options"
             app:layout_constraintEnd_toStartOf="@+id/fragment_display_songs_btn_more_options"
-            app:layout_constraintTop_toTopOf="@+id/fragment_display_songs_btn_more_options"
-            app:tint="#fff" />
+            app:layout_constraintTop_toTopOf="@+id/fragment_display_songs_btn_more_options" />
 
         <ImageView
             android:id="@+id/fragment_display_songs_img_refresh_data"
