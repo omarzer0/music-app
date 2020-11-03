@@ -171,6 +171,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
 //            String data = song.getData();
             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
             retriever.setDataSource(songData);
+            Log.e("TAG", songData );
             byte[] coverBytes = retriever.getEmbeddedPicture();
             Bitmap songCover;
 

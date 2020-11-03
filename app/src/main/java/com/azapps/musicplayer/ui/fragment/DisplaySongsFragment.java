@@ -406,8 +406,14 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     public void submitListChanges(int position) {
         Song temp_song = songList.get(position);
         songViewModel.delete(temp_song);
-        findTheCorrectPosition(song.getData());
+        try {
+            String data = song.getData();
+            findTheCorrectPosition(data);
+        }catch (NullPointerException e){
+            Log.e(TAG, "submitListChanges: "+e.getMessage() );
+        }
         broadCastToMediaScanner(getActivity(), new File(temp_song.getData()));
+        currentSongClickedPosition--;
     }
 
     private void findTheCorrectPosition(String data) {
@@ -611,6 +617,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         editor.putInt(CURRENT_SONG_POSITION, currentSongClickedPosition);
         editor.putString(CURRENT_SONG_IMAGE_DATA, song.getData());
         editor.putString(CURRENT_SONG_Title, song.getTitle());
+        Log.e(TAG, ""+song.getData() );
         editor.apply();
     }
 
@@ -646,14 +653,18 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT && mp.isPlaying()) {
             playBtnClicked();
             cameFromAudioFocus = true;
+            Log.e("TAG", "onAudioFocusChange: AUDIOFOCUS_LOSS_TRANSIENT" );
         } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
             playBtnClicked();
             releaseMediaPlayer();
+            Log.e("TAG", "onAudioFocusChange: AUDIOFOCUS_LOSS" );
         } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
             playBtnClicked();
+            Log.e("TAG", "onAudioFocusChange: AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK" );
         } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN && cameFromAudioFocus) {
             playBtnClicked();
             cameFromAudioFocus = false;
+            Log.e("TAG", "onAudioFocusChange: AUDIOFOCUS_GAIN" );
         }
         if (fragment != null && fragment.isVisible()) {
             fragment.play();

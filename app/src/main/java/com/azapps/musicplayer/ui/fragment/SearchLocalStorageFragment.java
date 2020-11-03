@@ -19,7 +19,7 @@ import com.azapps.musicplayer.ui.activity.HomeActivity;
 
 public class SearchLocalStorageFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "SearchLocal";
-    private Button searchAgainBtn;
+    private Button searchAgainBtn, backButton;
     private TextView showDoneText;
     private ProgressBar progressBar;
     private int numberOfSongs;
@@ -39,7 +39,9 @@ public class SearchLocalStorageFragment extends Fragment implements View.OnClick
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search_local_audio_files, container, false);
         searchAgainBtn = view.findViewById(R.id.fragment_search_local_audio_files_search_again_btn);
+        backButton = view.findViewById(R.id.fragment_search_local_audio_files_go_back_btn);
         searchAgainBtn.setOnClickListener(this);
+        backButton.setOnClickListener(this);
         showDoneText = view.findViewById(R.id.fragment_search_local_audio_files_done_tv);
         progressBar = view.findViewById(R.id.fragment_search_local_audio_files_progress_bar);
         ((HomeActivity) getActivity()).loadAudioFromTheDevice();
@@ -48,8 +50,13 @@ public class SearchLocalStorageFragment extends Fragment implements View.OnClick
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.fragment_search_local_audio_files_search_again_btn) {
-            ((HomeActivity) getActivity()).loadAudioFromTheDevice();
+        switch (v.getId()) {
+            case R.id.fragment_search_local_audio_files_search_again_btn:
+                ((HomeActivity) getActivity()).loadAudioFromTheDevice();
+                break;
+            case R.id.fragment_search_local_audio_files_go_back_btn:
+                getFragmentManager().popBackStack();
+                break;
         }
     }
 
