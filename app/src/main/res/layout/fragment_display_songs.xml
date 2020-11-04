@@ -86,6 +86,7 @@
             android:layout_marginEnd="32dp"
             android:src="@drawable/ic_favourite"
             android:scaleType="center"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/fragment_display_songs_btn_more_options"
             app:layout_constraintEnd_toStartOf="@+id/fragment_display_songs_btn_more_options"
             app:layout_constraintTop_toTopOf="@+id/fragment_display_songs_btn_more_options" />

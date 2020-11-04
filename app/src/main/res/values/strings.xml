@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Music Player</string>
+    <string name="app_name" translatable="false">AZ Player</string>
     <string name="search_for_songs"><font size="14">search for music</font></string>
     <string name="choose_a_song">choose a song</string>
     <!-- TODO: Remove or change this placeholder text -->
