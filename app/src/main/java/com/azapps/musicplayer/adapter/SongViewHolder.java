@@ -28,9 +28,7 @@ public class SongViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         root = itemView.findViewById(R.id.song_item_root_layout);
 
         moreImageView.setOnClickListener(this);
-        titleTV.setOnClickListener(this);
-        artistTV.setOnClickListener(this);
-        songImageView.setOnClickListener(this);
+        root.setOnClickListener(this);
         listener = onSongClickListener;
     }
 

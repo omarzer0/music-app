@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -90,10 +91,18 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
 //        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         View view = inflater.inflate(R.layout.fragment_music_player, container, false);
         initViews(view);
-        getSongExtra();
+        try {
+            getSongExtra();
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "getSongExtra Error\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
         prepareAndListenToPositionSeekBarChanges();
         updateSeekBar();
-        play();
+        try {
+            play();
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "play error\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
 
         return view;
     }
@@ -169,13 +178,15 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
 
     private void getSongExtra() {
         Uri uri = Uri.parse(cover);
+        // do not use glide here because it first loads the place holder then loads the image
+        // with glide the user will see the place holder first
         songCoverImage.setImageURI(uri);
         if (songCoverImage.getDrawable() == null)
             songCoverImage.setImageResource(R.drawable.default_image);
     }
 
     private String createTimeLabel(int time) {
-        String label = "";
+        String label;
         int min = time / 1000 / 60;
         int sec = time / 1000 % 60;
         label = min + ":";

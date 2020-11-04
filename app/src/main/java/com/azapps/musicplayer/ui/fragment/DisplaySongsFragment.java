@@ -146,15 +146,15 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     }
 
     private void checkIfThePermissionIsGranted() {
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             // not granted show explanation for the required permission
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 alertMessageBuilder();
             } else {
                 //request it again
                 ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_STORAGE);
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_STORAGE);
             }
 
         } else {
@@ -261,10 +261,10 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 String displayName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
                 String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
                 String year = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.YEAR));
-//                long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
-                long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
+                long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
                 Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-                Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, size);
+                Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, id);
                 String cover = albumArtUri.toString();
                 // Save to audioList
 
@@ -282,15 +282,19 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     private void runSearchFun(final boolean isFromOnCreate) {
 
-        final Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (currentSongClickedPosition != -1) {
-                    scanForAddOrDeletedSongs(isFromOnCreate);
+        try {
+            final Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (currentSongClickedPosition != -1) {
+                        scanForAddOrDeletedSongs(isFromOnCreate);
+                    }
                 }
-            }
-        }, 1000);
+            }, 6000);
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "runSearchFun error\n"+e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -334,11 +338,16 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     @Override
     public void onSongClick(int position) {
-        currentSongClickedPosition = position;
-        song = songList.get(position);
-        if (checkOnAudioFocus()) {
-            playMusic(song);
+        try {
+            currentSongClickedPosition = position;
+            song = songList.get(position);
+            if (checkOnAudioFocus()) {
+                playMusic(song);
+            }
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "onSongClick error \n"+e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+
     }
 
 
@@ -420,7 +429,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 }
             }
         } catch (Exception e) {
-            e.getMessage();
+            Toast.makeText(getActivity(), "find  the correct position error\n"+e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -496,11 +505,15 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     }
 
     private void controlBodyClicked() {
-        if (song != null) {
-            Utils.replaceFragments(MusicPlayerFragment.newInstance(song.getTitle(),
-                    song.getArtist(), song.getData(), mp.getDuration(), song.getCover()),
-                    getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_MUSIC_PLAYER_TAG);
-            constraintLayoutFound.setVisibility(View.GONE);
+        try {
+            if (song != null) {
+                Utils.replaceFragments(MusicPlayerFragment.newInstance(song.getTitle(),
+                        song.getArtist(), song.getData(), mp.getDuration(), song.getCover()),
+                        getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_MUSIC_PLAYER_TAG);
+                constraintLayoutFound.setVisibility(View.GONE);
+            }
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "controlBodyClicked error\n"+e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -516,9 +529,9 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 mp.pause();
                 playBtn.setImageResource(R.drawable.ic_play_button);
             }
-        } else if (currentSongClickedPosition != -1) {
+        } else if (currentSongClickedPosition != -1 && currentSongClickedPosition < songList.size()) {
             onSongClick(currentSongClickedPosition);
-        } else {
+        } else if (songList.size() > 0) {
             onSongClick(0);
         }
         Log.e(TAG, "playBtnClicked: " + currentSongClickedPosition);
@@ -691,5 +704,4 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
             fragment.getSongChanged();
         }
     }
-
 }
