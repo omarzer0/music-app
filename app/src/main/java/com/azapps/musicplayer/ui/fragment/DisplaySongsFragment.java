@@ -111,11 +111,15 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_display_songs, container, false);
-        initViews(view);
-        setRecyclerView(view);
-        checkIfThePermissionIsGranted();
-        runSearchFun(true);
-        getFromPreference();
+        try {
+            initViews(view);
+            setRecyclerView(view);
+            checkIfThePermissionIsGranted();
+            runSearchFun(true);
+            getFromPreference();
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "onCreateView error\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
         return view;
     }
 
@@ -191,14 +195,22 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     }
 
     public void loadAudioFromTheDevice() {
-        modelViewInstantiate();
-        getMusic(true);
+        try {
+            modelViewInstantiate();
+            getMusic(true);
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "loadAudioFromTheDevice\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void audioFilesWasFound() {
-        if (songList.size() > 0) {
-            constraintLayoutFound.setVisibility(View.VISIBLE);
-            constraintLayoutNotFound.setVisibility(View.GONE);
+        try {
+            if (songList.size() > 0) {
+                constraintLayoutFound.setVisibility(View.VISIBLE);
+                constraintLayoutNotFound.setVisibility(View.GONE);
+            }
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "audioFilesWasFound\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -293,7 +305,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 }
             }, 6000);
         } catch (Exception e) {
-            Toast.makeText(getActivity(), "runSearchFun error\n"+e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "runSearchFun error\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -345,7 +357,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 playMusic(song);
             }
         } catch (Exception e) {
-            Toast.makeText(getActivity(), "onSongClick error \n"+e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "onSongClick error \n" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -381,8 +393,12 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 moreOptionsBtnClicked();
                 break;
             case R.id.fragment_display_songs_search_local_db_tv:
-                constraintLayoutNotFound.setVisibility(View.GONE);
-                Utils.replaceFragments(SearchLocalStorageFragment.newInstance(), getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_SEARCH_LOCAL_STORAGE_TAG);
+                try {
+                    constraintLayoutNotFound.setVisibility(View.GONE);
+                    Utils.replaceFragments(SearchLocalStorageFragment.newInstance(), getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_SEARCH_LOCAL_STORAGE_TAG);
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(), "fragment_display_songs_search_local_db_tv\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.fragment_display_songs_img_refresh_data:
                 scanForAddOrDeletedSongs(false);
@@ -429,7 +445,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 }
             }
         } catch (Exception e) {
-            Toast.makeText(getActivity(), "find  the correct position error\n"+e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "find  the correct position error\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -513,7 +529,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                 constraintLayoutFound.setVisibility(View.GONE);
             }
         } catch (Exception e) {
-            Toast.makeText(getActivity(), "controlBodyClicked error\n"+e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "controlBodyClicked error\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -72,9 +72,9 @@ public class MusicNotification {
                 .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
 
                 .setNotificationSilent()
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(mediaSessionCompat.getSessionToken()))
-
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setContentTitle("Music Service")
                 .setSmallIcon(R.mipmap.ic_launcher_foreground);

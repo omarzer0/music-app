@@ -26,7 +26,7 @@ public class MusicService extends Service {
         String songData = intent.getStringExtra(SEND_SONG_DATA_STRING_EXTRA);
         String songTitle = intent.getStringExtra(SEND_SONG_TITLE_STRING_EXTRA);
         NotificationCompat.Builder builder = createNotificationCompat(this, isPlaying, songTitle, songData);
-        startForeground(10, builder.build());
+        startForeground(1, builder.build());
 
         return START_NOT_STICKY;
     }
