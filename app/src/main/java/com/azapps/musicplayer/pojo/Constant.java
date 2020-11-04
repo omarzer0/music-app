@@ -6,6 +6,7 @@ public class Constant {
     public static final String ACTION_PREVIOUS = "action previous";
     public static final String ACTION_PLAY = "action play";
     public static final String ACTION_NEXT = "action next";
+    public static final String ACTION_CLOSE = "action close";
     public static final String ACTION_NAME = "actionName";
     public static final String ACTION_PAUSE = "action stop";
     public static final String MUSIC_BROADCAST_SEND_INTENT = "send broadcast intent";

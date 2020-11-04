@@ -57,6 +57,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.azapps.musicplayer.pojo.Constant.ACTION_CLOSE;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NAME;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NEXT;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PLAY;
@@ -622,6 +623,13 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
                     case ACTION_NEXT:
                         nextBtnClicked();
+                        break;
+
+                    case ACTION_CLOSE:
+                        releaseMediaPlayer();
+                        Intent serviceIntent = new Intent(getActivity(), MusicService.class);
+                        getActivity().stopService(serviceIntent);
+                        saveToPreference();
                         break;
 
                 }
