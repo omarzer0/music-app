@@ -47,7 +47,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.azapps.musicplayer.R;
 import com.azapps.musicplayer.adapter.OnSongClickListener;
 import com.azapps.musicplayer.adapter.SongAdapter;
-import com.azapps.musicplayer.broadcast.HeadsetBroadCastReceiver;
 import com.azapps.musicplayer.pojo.Song;
 import com.azapps.musicplayer.pojo.Utils;
 import com.azapps.musicplayer.service.MusicService;
@@ -637,7 +636,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         }
     };
 
-    BroadcastReceiver headPhoneBroadCastReceiver = new HeadsetBroadCastReceiver() {
+    BroadcastReceiver headPhoneBroadCastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Intent.ACTION_HEADSET_PLUG)) {
