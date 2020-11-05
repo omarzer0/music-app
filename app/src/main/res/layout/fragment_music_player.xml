@@ -11,15 +11,15 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_marginTop="60dp"
-        tools:src="@drawable/default_image"
-        app:civ_border="true"
-        app:civ_border_width="2dp"
-        app:civ_border_color_start="#FF6200EE"
-        app:civ_border_color="#EE0014"
         android:scaleType="centerCrop"
+        app:civ_border="true"
+        app:civ_border_color="#EE0014"
+        app:civ_border_color_start="#FF6200EE"
+        app:civ_border_width="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/default_image" />
 
     <SeekBar
         android:id="@+id/fragment_music_player_positionSeekBar"
@@ -117,9 +117,9 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_marginStart="32dp"
+            android:background="@drawable/round_button_shape"
             android:layoutDirection="ltr"
             android:src="@drawable/ic_play_button"
-            android:background="@drawable/round_button_shape"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/fragment_music_player_previous"
             app:layout_constraintTop_toTopOf="parent" />
@@ -137,6 +137,25 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <ImageView
+        android:id="@+id/fragment_music_player_img_repeat_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_repeat"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout"
+        app:layout_constraintEnd_toStartOf="@+id/constraintLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout" />
+
+
+    <ImageView
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@drawable/ic_playlist"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/constraintLayout"
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline4"

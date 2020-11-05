@@ -70,6 +70,7 @@ import static com.azapps.musicplayer.pojo.Constant.CURRENT_SONG_Title;
 import static com.azapps.musicplayer.pojo.Constant.DELETE_BOTTOM_SHEET_TAG;
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_MUSIC_PLAYER_TAG;
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_SEARCH_LOCAL_STORAGE_TAG;
+import static com.azapps.musicplayer.pojo.Constant.IS_LOOPING_EXTRA;
 import static com.azapps.musicplayer.pojo.Constant.MORE_BOTTOM_SHEET_TAG;
 import static com.azapps.musicplayer.pojo.Constant.MUSIC_BROADCAST_SEND_INTENT;
 import static com.azapps.musicplayer.pojo.Constant.MY_PREFS_NAME;
@@ -605,6 +606,14 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         modelViewInstantiate();
     }
 
+    public boolean getLoopingState() {
+        return isLooping;
+    }
+
+    public void setLoopingState(boolean state) {
+        isLooping = state;
+        if (mp != null) mp.setLooping(isLooping);
+    }
 
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -641,7 +650,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Intent.ACTION_HEADSET_PLUG)) {
                 int state = intent.getIntExtra("state", -1);
-                Log.e("TAG", "onReceive: " +state);
+                Log.e("TAG", "onReceive: " + state);
                 if (state == 0) {
                     if (mp != null && mp.isPlaying()) playBtnClicked();
                 }
@@ -673,6 +682,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         editor.putInt(CURRENT_SONG_POSITION, currentSongClickedPosition);
         editor.putString(CURRENT_SONG_IMAGE_DATA, song.getCover());
         editor.putString(CURRENT_SONG_Title, song.getTitle());
+        editor.putBoolean(IS_LOOPING_EXTRA,isLooping);
         Log.e(TAG, "" + song.getData());
         editor.apply();
     }
@@ -682,6 +692,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         currentSongClickedPosition = preferences.getInt(CURRENT_SONG_POSITION, -1);
         String cover = preferences.getString(CURRENT_SONG_IMAGE_DATA, "");
         String title = preferences.getString(CURRENT_SONG_Title, getString(R.string.choose_a_song));
+        isLooping = preferences.getBoolean(IS_LOOPING_EXTRA, false);
         if (cover.equals("")) nowPlayingImageView.setImageResource(R.drawable.default_image);
         else setImageToPlayerControl(cover);
         nowPlayingTextView.setText(title);

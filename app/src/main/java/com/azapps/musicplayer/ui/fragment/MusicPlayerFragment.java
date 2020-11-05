@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +46,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     private ImageButton playBtn;
     private SeekBar positionSeekBar;
     private TextView elapsedTimeLabel, totalTimeLabel, songTitleTV, songArtistTV;
+    private ImageView repeatBtn;
 
     private Handler mSeekBarUpdateHandler;
     private Runnable mUpdateSeekBar;
@@ -93,6 +95,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         initViews(view);
         try {
             getSongExtra();
+            getIsLooping();
         } catch (Exception e) {
             Toast.makeText(getActivity(), "getSongExtra Error\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -115,6 +118,8 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         nextBtn.setOnClickListener(this);
         previousBtn = view.findViewById(R.id.fragment_music_player_previous);
         previousBtn.setOnClickListener(this);
+        repeatBtn = view.findViewById(R.id.fragment_music_player_img_repeat_image_view);
+        repeatBtn.setOnClickListener(this);
 
         songCoverImage = view.findViewById(R.id.fragment_music_player_song_img_cover);
         elapsedTimeLabel = view.findViewById(R.id.fragment_music_player_elapsedTimeLabel);
@@ -185,6 +190,14 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
             songCoverImage.setImageResource(R.drawable.default_image);
     }
 
+    private void getIsLooping() {
+        if (((HomeActivity) getActivity()).getLoopingState()){
+            repeatBtn.setImageResource(R.drawable.ic_repeat_once);
+        }else{
+            repeatBtn.setImageResource(R.drawable.ic_repeat);
+        }
+    }
+
     private String createTimeLabel(int time) {
         String label;
         int min = time / 1000 / 60;
@@ -237,6 +250,17 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
                 ((HomeActivity) getActivity()).nextBtnClicked();
                 reversePlay();
                 getSongChanged();
+                break;
+
+            case R.id.fragment_music_player_img_repeat_image_view:
+                if (((HomeActivity) getActivity()).getLoopingState()){ // looping is true make it false
+                    ((HomeActivity) getActivity()).setLoopingState(false);
+                    repeatBtn.setImageResource(R.drawable.ic_repeat);
+                }else{
+                    ((HomeActivity) getActivity()).setLoopingState(true); // looping is false make it true
+                    repeatBtn.setImageResource(R.drawable.ic_repeat_once);
+                }
+                break;
         }
     }
 

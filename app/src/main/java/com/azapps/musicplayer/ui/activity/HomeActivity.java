@@ -111,4 +111,14 @@ public class HomeActivity extends AppCompatActivity {
         getDisplaySongFragmentInstance();
         return displaySongsFragment.getSongCover();
     }
+
+    public boolean getLoopingState(){
+        getDisplaySongFragmentInstance();
+        return displaySongsFragment.getLoopingState();
+    }
+
+    public void setLoopingState(boolean state){
+        getDisplaySongFragmentInstance();
+        displaySongsFragment.setLoopingState(state);
+    }
 }

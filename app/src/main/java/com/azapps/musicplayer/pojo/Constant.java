@@ -13,6 +13,7 @@ public class Constant {
     public static final String SEND_IS_PLAYING_BOOLEAN_EXTRA = "SEND_IS_PLAYING_BOOLEAN_EXTRA";
     public static final String SEND_SONG_TITLE_STRING_EXTRA = "SEND_SONG_TITLE_STRING_EXTRA";
     public static final String SEND_SONG_DATA_STRING_EXTRA = "SEND_SONG_DATA_STRING_EXTRA";
+    public static final String IS_LOOPING_EXTRA ="is looping extra";
     public static final String FRAGMENT_MUSIC_PLAYER_TAG = "music player fragment tag";
     public static final String FRAGMENT_SORT_ORDER_TAG = "order fragment tag";
     public static final String FRAGMENT_DISPLAY_SONG = "display song fragment tag";
