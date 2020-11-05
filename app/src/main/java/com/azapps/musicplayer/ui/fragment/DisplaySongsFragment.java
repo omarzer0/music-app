@@ -641,6 +641,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Intent.ACTION_HEADSET_PLUG)) {
                 int state = intent.getIntExtra("state", -1);
+                Log.e("TAG", "onReceive: " +state);
                 if (state == 0) {
                     if (mp != null && mp.isPlaying()) playBtnClicked();
                 }
@@ -649,12 +650,11 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     };
 
     @Override
-    public void onStart() {
-        super.onStart();
-        getActivity().registerReceiver(broadcastReceiver, new IntentFilter(MUSIC_BROADCAST_SEND_INTENT));
-
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         IntentFilter receiverFilter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
         getActivity().registerReceiver(headPhoneBroadCastReceiver, receiverFilter);
+        getActivity().registerReceiver(broadcastReceiver, new IntentFilter(MUSIC_BROADCAST_SEND_INTENT));
     }
 
     @Override
