@@ -47,6 +47,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.azapps.musicplayer.R;
 import com.azapps.musicplayer.adapter.OnSongClickListener;
 import com.azapps.musicplayer.adapter.SongAdapter;
+import com.azapps.musicplayer.broadcast.HeadsetBroadCastReceiver;
 import com.azapps.musicplayer.pojo.Song;
 import com.azapps.musicplayer.pojo.Utils;
 import com.azapps.musicplayer.service.MusicService;
@@ -636,10 +637,25 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         }
     };
 
+    BroadcastReceiver headPhoneBroadCastReceiver = new HeadsetBroadCastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_HEADSET_PLUG)) {
+                int state = intent.getIntExtra("state", -1);
+                if (state == 0) {
+                    if (mp != null && mp.isPlaying()) playBtnClicked();
+                }
+            }
+        }
+    };
+
     @Override
     public void onStart() {
         super.onStart();
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter(MUSIC_BROADCAST_SEND_INTENT));
+
+        IntentFilter receiverFilter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+        getActivity().registerReceiver(headPhoneBroadCastReceiver, receiverFilter);
     }
 
     @Override
@@ -647,6 +663,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         super.onDestroy();
         releaseMediaPlayer();
         getActivity().unregisterReceiver(broadcastReceiver);
+        getActivity().unregisterReceiver(headPhoneBroadCastReceiver);
         Intent serviceIntent = new Intent(getActivity(), MusicService.class);
         getActivity().stopService(serviceIntent);
         saveToPreference();
