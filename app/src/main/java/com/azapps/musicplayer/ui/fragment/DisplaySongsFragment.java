@@ -324,11 +324,15 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     }
 
     private void scanForAddOrDeletedSongs(boolean isFromOnCreate) {
-        getMusic(isFromOnCreate);
-        refreshSongs();
-        if (song != null)
-            findTheCorrectPosition(song.getData());
-        Log.e("TAG", "run: ");
+        try {
+            getMusic(isFromOnCreate);
+            refreshSongs();
+            if (song != null)
+                findTheCorrectPosition(song.getData());
+            Log.e("TAG", "run: ");
+        } catch (Exception e) {
+
+        }
     }
 
     boolean checkIfSongExists(String data) {
@@ -725,22 +729,19 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     @Override
     public void onDestroy() {
         super.onDestroy();
-        try {
-            releaseMediaPlayer();
-            getActivity().unregisterReceiver(serviceClicksBroadcastReceiver);
-            getActivity().unregisterReceiver(headPhoneBroadCastReceiver);
-            getActivity().unregisterReceiver(bluetoothHeadPhonesBroadCastReceivers);
-            audioManager.unregisterMediaButtonEventReceiver(receiverComponent);
-            Intent serviceIntent = new Intent(getActivity(), MusicService.class);
-            getActivity().stopService(serviceIntent);
-            saveToPreference();
-        } catch (Exception e) {
-            Toast.makeText(getActivity(), "onDestroy\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+        releaseMediaPlayer();
+        getActivity().unregisterReceiver(serviceClicksBroadcastReceiver);
+        getActivity().unregisterReceiver(headPhoneBroadCastReceiver);
+        getActivity().unregisterReceiver(bluetoothHeadPhonesBroadCastReceivers);
+        audioManager.unregisterMediaButtonEventReceiver(receiverComponent);
+        Intent serviceIntent = new Intent(getActivity(), MusicService.class);
+        getActivity().stopService(serviceIntent);
+        saveToPreference();
     }
 
     private void saveToPreference() {
         SharedPreferences.Editor editor = getActivity().getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE).edit();
+        if (song == null) return;
         editor.putInt(CURRENT_SONG_POSITION, currentSongClickedPosition);
         editor.putString(CURRENT_SONG_IMAGE_DATA, song.getCover());
         editor.putString(CURRENT_SONG_Title, song.getTitle());
