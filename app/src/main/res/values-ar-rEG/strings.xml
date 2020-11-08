@@ -20,4 +20,6 @@
     <string name="delete">حذف</string>
     <string name="go_back">العودة</string>
     <string name="playlist">قائمة التشغيل</string>
+    <string name="repeat_the_current_song">تكرار الأغنية الحالية فقط</string>
+    <string name="play_all_songs_in_the_list">تشغيل كافة الأغاني بالقائمة</string>
 </resources>

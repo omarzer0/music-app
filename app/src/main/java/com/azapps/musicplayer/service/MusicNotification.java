@@ -17,6 +17,7 @@ import com.azapps.musicplayer.ui.activity.HomeActivity;
 
 import static com.azapps.musicplayer.pojo.Constant.ACTION_CLOSE;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NEXT;
+import static com.azapps.musicplayer.pojo.Constant.ACTION_OPEN_APP;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PLAY;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PREVIOUS;
 import static com.azapps.musicplayer.pojo.Constant.CHANNEL_ID;
@@ -44,6 +45,9 @@ public class MusicNotification {
         broadcastIntentClose.setAction(ACTION_CLOSE);
         PendingIntent actionIntentClose = PendingIntent.getBroadcast(context, 0, broadcastIntentClose, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        Intent broadcastIntentOpenApp = new Intent(context, MusicBroadcast.class);
+        broadcastIntentOpenApp.setAction(ACTION_OPEN_APP);
+        PendingIntent actionIntentOpenApp = PendingIntent.getBroadcast(context,0,broadcastIntentOpenApp,PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         RemoteViews collapsedView = new RemoteViews(context.getPackageName(), R.layout.notification_collapsed);
@@ -72,6 +76,7 @@ public class MusicNotification {
         collapsedView.setOnClickPendingIntent(R.id.notification_collapsed_play_btn, actionIntentPlay);
         collapsedView.setOnClickPendingIntent(R.id.notification_collapsed_next_btn, actionIntentNext);
         collapsedView.setOnClickPendingIntent(R.id.notification_collapsed_close_btn, actionIntentClose);
+        collapsedView.setOnClickPendingIntent(R.id.notification_collapsed_root_view_relative_layout, actionIntentOpenApp);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setCustomContentView(collapsedView)

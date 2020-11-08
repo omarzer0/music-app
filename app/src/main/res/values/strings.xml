@@ -20,4 +20,6 @@
     <string name="delete">delete</string>
     <string name="go_back">go back</string>
     <string name="playlist">Playlist</string>
+    <string name="repeat_the_current_song">repeat the current song only</string>
+    <string name="play_all_songs_in_the_list">play all the list</string>
 </resources>

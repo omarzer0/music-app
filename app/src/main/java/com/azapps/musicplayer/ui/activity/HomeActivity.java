@@ -10,11 +10,14 @@ import androidx.fragment.app.FragmentManager;
 import com.azapps.musicplayer.R;
 import com.azapps.musicplayer.pojo.Utils;
 import com.azapps.musicplayer.ui.fragment.DisplaySongsFragment;
+import com.azapps.musicplayer.ui.fragment.MusicPlayerFragment;
 
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_DISPLAY_SONG;
+import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_MUSIC_PLAYER_TAG;
 
 public class HomeActivity extends AppCompatActivity {
     private DisplaySongsFragment displaySongsFragment;
+    private MusicPlayerFragment musicPlayerFragment;
     public static final String TAG = "HomeActivity";
 
     @Override
@@ -120,5 +123,10 @@ public class HomeActivity extends AppCompatActivity {
     public void setLoopingState(boolean state){
         getDisplaySongFragmentInstance();
         displaySongsFragment.setLoopingState(state);
+    }
+
+    public void closeBtnClicked() {
+        getDisplaySongFragmentInstance();
+        displaySongsFragment.closeBtnClicked();
     }
 }

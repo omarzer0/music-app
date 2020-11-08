@@ -6,14 +6,15 @@ public class Constant {
     public static final String ACTION_NEXT = "action next";
     public static final String ACTION_CLOSE = "action close";
     public static final String ACTION_NAME = "actionName";
+    public static final String ACTION_OPEN_APP = "actionOpenApp";
     public static final String MUSIC_BROADCAST_SEND_INTENT = "send broadcast intent";
-    public static final String BROADCAST_HEADPHONE_INTENT = "headphone broadcast intent";
-    public static final String HEADPHONE_ACTION = "plug or unplug headphone";
+    public static final String BROADCAST_BLUETOOTH_HEADPHONE_INTENT = "bluetooth headphone broadcast intent";
+    public static final String HEADPHONE_BLUETOOTH_EXTRA = "bluetooth headphone extra";
     public static final String CHANNEL_ID = "service channel";
     public static final String SEND_IS_PLAYING_BOOLEAN_EXTRA = "SEND_IS_PLAYING_BOOLEAN_EXTRA";
     public static final String SEND_SONG_TITLE_STRING_EXTRA = "SEND_SONG_TITLE_STRING_EXTRA";
     public static final String SEND_SONG_DATA_STRING_EXTRA = "SEND_SONG_DATA_STRING_EXTRA";
-    public static final String IS_LOOPING_EXTRA ="is looping extra";
+    public static final String IS_LOOPING_EXTRA = "is looping extra";
     public static final String FRAGMENT_MUSIC_PLAYER_TAG = "music player fragment tag";
     public static final String FRAGMENT_SORT_ORDER_TAG = "order fragment tag";
     public static final String FRAGMENT_DISPLAY_SONG = "display song fragment tag";
@@ -27,4 +28,7 @@ public class Constant {
     public static final String CURRENT_SONG_POSITION = "current song position";
     public static final String CURRENT_SONG_IMAGE_DATA = "CURRENT_SONG_IMAGE_DATA";
     public static final String CURRENT_SONG_Title = "CURRENT_SONG_Title";
+    public static final String BLUETOOTH_PLAY = "PLAY";
+    public static final String BLUETOOTH_NEXT = "NEXT";
+    public static final String BLUETOOTH_PREVIOUS = "PREVIOUS";
 }

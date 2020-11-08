@@ -26,10 +26,16 @@ import com.azapps.musicplayer.R;
 import com.azapps.musicplayer.ui.activity.HomeActivity;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
+import static com.azapps.musicplayer.pojo.Constant.ACTION_CLOSE;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NAME;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NEXT;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PLAY;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PREVIOUS;
+import static com.azapps.musicplayer.pojo.Constant.BLUETOOTH_NEXT;
+import static com.azapps.musicplayer.pojo.Constant.BLUETOOTH_PLAY;
+import static com.azapps.musicplayer.pojo.Constant.BLUETOOTH_PREVIOUS;
+import static com.azapps.musicplayer.pojo.Constant.BROADCAST_BLUETOOTH_HEADPHONE_INTENT;
+import static com.azapps.musicplayer.pojo.Constant.HEADPHONE_BLUETOOTH_EXTRA;
 import static com.azapps.musicplayer.pojo.Constant.MUSIC_BROADCAST_SEND_INTENT;
 
 public class MusicPlayerFragment extends Fragment implements View.OnClickListener {
@@ -58,6 +64,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     private String songArtist;
     private int totalTime;
     private String cover;
+    private boolean isFirstTime = true;
 
     public MusicPlayerFragment() {
     }
@@ -171,11 +178,15 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         mUpdateSeekBar = new Runnable() {
             @Override
             public void run() {
-                currentPosition = ((HomeActivity) getActivity()).getCurrentSongPosition();
-                positionSeekBar.setProgress(currentPosition);
-                mSeekBarUpdateHandler.postDelayed(this, 50);
-                String elapsedTime = createTimeLabel(currentPosition);
-                elapsedTimeLabel.setText(elapsedTime);
+                try {
+                    currentPosition = ((HomeActivity) getActivity()).getCurrentSongPosition();
+                    positionSeekBar.setProgress(currentPosition);
+                    mSeekBarUpdateHandler.postDelayed(this, 50);
+                    String elapsedTime = createTimeLabel(currentPosition);
+                    elapsedTimeLabel.setText(elapsedTime);
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(), "updateSeekBar\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
 
             }
         };
@@ -191,9 +202,9 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     }
 
     private void getIsLooping() {
-        if (((HomeActivity) getActivity()).getLoopingState()){
+        if (((HomeActivity) getActivity()).getLoopingState()) {
             repeatBtn.setImageResource(R.drawable.ic_repeat_once);
-        }else{
+        } else {
             repeatBtn.setImageResource(R.drawable.ic_repeat);
         }
     }
@@ -253,20 +264,21 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
                 break;
 
             case R.id.fragment_music_player_img_repeat_image_view:
-                if (((HomeActivity) getActivity()).getLoopingState()){ // looping is true make it false
+                if (((HomeActivity) getActivity()).getLoopingState()) { // looping is true make it false
                     ((HomeActivity) getActivity()).setLoopingState(false);
                     repeatBtn.setImageResource(R.drawable.ic_repeat);
-                }else{
+                    Toast.makeText(getActivity(), R.string.play_all_songs_in_the_list, Toast.LENGTH_SHORT).show();
+                } else {
                     ((HomeActivity) getActivity()).setLoopingState(true); // looping is false make it true
                     repeatBtn.setImageResource(R.drawable.ic_repeat_once);
+                    Toast.makeText(getActivity(), R.string.repeat_the_current_song, Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
     }
 
 
-    private IntentFilter filter = new IntentFilter(MUSIC_BROADCAST_SEND_INTENT);
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver serviceClicksBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getExtras().getString(ACTION_NAME);
@@ -289,6 +301,54 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
                     reversePlay();
                     getSongChanged();
                     break;
+
+                case ACTION_CLOSE:
+                    ((HomeActivity) getActivity()).closeBtnClicked();
+                    play();
+                    break;
+            }
+        }
+    };
+
+
+    private BroadcastReceiver headPhoneBroadCastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_HEADSET_PLUG)) {
+                int state = intent.getIntExtra("state", -1);
+//                if (state == 0) {
+//                    if (!isFirstTime) {
+//                        ((HomeActivity) getActivity()).playBtnClicked();
+//                        play();
+//                    } else {
+//                        isFirstTime = false;
+//                    }
+//                }
+            }
+        }
+    };
+
+
+    private BroadcastReceiver bluetoothHeadPhonesBroadCastReceivers = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String code = intent.getStringExtra(HEADPHONE_BLUETOOTH_EXTRA);
+            if ((code == null)) return;
+            switch (code) {
+                case BLUETOOTH_PLAY:
+                    ((HomeActivity) getActivity()).playBtnClicked();
+                    play();
+                    break;
+                case BLUETOOTH_NEXT:
+                    ((HomeActivity) getActivity()).nextBtnClicked();
+                    reversePlay();
+                    getSongChanged();
+                    break;
+                case BLUETOOTH_PREVIOUS:
+                    ((HomeActivity) getActivity()).previousBtnClicked();
+                    reversePlay();
+                    getSongChanged();
+                    break;
             }
         }
     };
@@ -296,7 +356,13 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     @Override
     public void onStart() {
         super.onStart();
-        getActivity().registerReceiver(broadcastReceiver, filter);
+        try {
+            getActivity().registerReceiver(serviceClicksBroadcastReceiver, new IntentFilter(MUSIC_BROADCAST_SEND_INTENT));
+            getActivity().registerReceiver(headPhoneBroadCastReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
+            getActivity().registerReceiver(bluetoothHeadPhonesBroadCastReceivers, new IntentFilter(BROADCAST_BLUETOOTH_HEADPHONE_INTENT));
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "onStart\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void getSongChanged() {
@@ -313,7 +379,9 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     public void onDetach() {
         super.onDetach();
         try {
-            getActivity().unregisterReceiver(broadcastReceiver);
+            getActivity().unregisterReceiver(serviceClicksBroadcastReceiver);
+            getActivity().unregisterReceiver(headPhoneBroadCastReceiver);
+            getActivity().unregisterReceiver(bluetoothHeadPhonesBroadCastReceivers);
             getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             mSeekBarUpdateHandler.removeCallbacks(mUpdateSeekBar);
             ConstraintLayout constraintLayout = getActivity().findViewById(R.id.fragment_display_songs_root_constraint_found);

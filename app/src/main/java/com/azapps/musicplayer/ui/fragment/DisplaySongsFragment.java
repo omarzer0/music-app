@@ -3,6 +3,7 @@ package com.azapps.musicplayer.ui.fragment;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -47,6 +48,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.azapps.musicplayer.R;
 import com.azapps.musicplayer.adapter.OnSongClickListener;
 import com.azapps.musicplayer.adapter.SongAdapter;
+import com.azapps.musicplayer.broadcast.MediaButtonIntentReceiver;
 import com.azapps.musicplayer.pojo.Song;
 import com.azapps.musicplayer.pojo.Utils;
 import com.azapps.musicplayer.service.MusicService;
@@ -60,16 +62,22 @@ import java.util.List;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_CLOSE;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NAME;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_NEXT;
+import static com.azapps.musicplayer.pojo.Constant.ACTION_OPEN_APP;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PLAY;
 import static com.azapps.musicplayer.pojo.Constant.ACTION_PREVIOUS;
 import static com.azapps.musicplayer.pojo.Constant.ADDED_TIME_ORDER;
 import static com.azapps.musicplayer.pojo.Constant.ALPHA_ORDER;
+import static com.azapps.musicplayer.pojo.Constant.BLUETOOTH_NEXT;
+import static com.azapps.musicplayer.pojo.Constant.BLUETOOTH_PLAY;
+import static com.azapps.musicplayer.pojo.Constant.BLUETOOTH_PREVIOUS;
+import static com.azapps.musicplayer.pojo.Constant.BROADCAST_BLUETOOTH_HEADPHONE_INTENT;
 import static com.azapps.musicplayer.pojo.Constant.CURRENT_SONG_IMAGE_DATA;
 import static com.azapps.musicplayer.pojo.Constant.CURRENT_SONG_POSITION;
 import static com.azapps.musicplayer.pojo.Constant.CURRENT_SONG_Title;
 import static com.azapps.musicplayer.pojo.Constant.DELETE_BOTTOM_SHEET_TAG;
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_MUSIC_PLAYER_TAG;
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_SEARCH_LOCAL_STORAGE_TAG;
+import static com.azapps.musicplayer.pojo.Constant.HEADPHONE_BLUETOOTH_EXTRA;
 import static com.azapps.musicplayer.pojo.Constant.IS_LOOPING_EXTRA;
 import static com.azapps.musicplayer.pojo.Constant.MORE_BOTTOM_SHEET_TAG;
 import static com.azapps.musicplayer.pojo.Constant.MUSIC_BROADCAST_SEND_INTENT;
@@ -103,6 +111,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     private int currentSongClickedPosition = -1;
     private boolean isLooping = false, cameFromAudioFocus = false;
     private static int orderOfAudioFiles = ADDED_TIME_ORDER;
+    private ComponentName receiverComponent;
 
     public static Fragment newInstance() {
         return new DisplaySongsFragment();
@@ -138,6 +147,8 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         constraintLayoutFound = view.findViewById(R.id.fragment_display_songs_root_constraint_found);
         constraintLayoutNotFound = view.findViewById(R.id.fragment_display_songs_root_not_found);
         audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
+        receiverComponent = new ComponentName(getActivity(), MediaButtonIntentReceiver.class);
+        audioManager.registerMediaButtonEventReceiver(receiverComponent);
         setListeners();
     }
 
@@ -615,7 +626,11 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         if (mp != null) mp.setLooping(isLooping);
     }
 
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    public boolean getIsMpNull() {
+        return mp == null;
+    }
+
+    private BroadcastReceiver serviceClicksBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getExtras().getString(ACTION_NAME);
@@ -635,25 +650,62 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
                         break;
 
                     case ACTION_CLOSE:
-                        releaseMediaPlayer();
-                        Intent serviceIntent = new Intent(getActivity(), MusicService.class);
-                        getActivity().stopService(serviceIntent);
-                        saveToPreference();
+                        closeBtnClicked();
+                        break;
+
+                    case ACTION_OPEN_APP:
+
                         break;
 
                 }
         }
     };
 
-    BroadcastReceiver headPhoneBroadCastReceiver = new BroadcastReceiver() {
+
+    public void closeBtnClicked() {
+        if (mp.isPlaying()) playBtnClicked();
+        Intent serviceIntent = new Intent(getActivity(), MusicService.class);
+        getActivity().stopService(serviceIntent);
+    }
+
+    private BroadcastReceiver headPhoneBroadCastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Intent.ACTION_HEADSET_PLUG)) {
                 int state = intent.getIntExtra("state", -1);
-                Log.e("TAG", "onReceive: " + state);
-                if (state == 0) {
-                    if (mp != null && mp.isPlaying()) playBtnClicked();
+                MusicPlayerFragment fragment = (MusicPlayerFragment) getActivity().getSupportFragmentManager().findFragmentByTag(FRAGMENT_MUSIC_PLAYER_TAG);
+                if (fragment == null) {
+                    getStateForHeadPhoneUnplug(state);
                 }
+            }
+        }
+    };
+
+    public void getStateForHeadPhoneUnplug(int state) {
+        if (state == 0) {
+            if (mp != null && mp.isPlaying()) playBtnClicked();
+        }
+    }
+
+
+    private BroadcastReceiver bluetoothHeadPhonesBroadCastReceivers = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String code = intent.getStringExtra(HEADPHONE_BLUETOOTH_EXTRA);
+            MusicPlayerFragment fragment = (MusicPlayerFragment) getActivity().getSupportFragmentManager().findFragmentByTag(FRAGMENT_MUSIC_PLAYER_TAG);
+
+            if ((code == null)) return;
+            if ((fragment != null)) return;
+            switch (code) {
+                case BLUETOOTH_PLAY:
+                    playBtnClicked();
+                    break;
+                case BLUETOOTH_NEXT:
+                    nextBtnClicked();
+                    break;
+                case BLUETOOTH_PREVIOUS:
+                    previousBtnClicked();
+                    break;
             }
         }
     };
@@ -661,20 +713,30 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        IntentFilter receiverFilter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
-        getActivity().registerReceiver(headPhoneBroadCastReceiver, receiverFilter);
-        getActivity().registerReceiver(broadcastReceiver, new IntentFilter(MUSIC_BROADCAST_SEND_INTENT));
+        try {
+            getActivity().registerReceiver(serviceClicksBroadcastReceiver, new IntentFilter(MUSIC_BROADCAST_SEND_INTENT));
+            getActivity().registerReceiver(headPhoneBroadCastReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
+            getActivity().registerReceiver(bluetoothHeadPhonesBroadCastReceivers, new IntentFilter(BROADCAST_BLUETOOTH_HEADPHONE_INTENT));
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "onCreate \n" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        releaseMediaPlayer();
-        getActivity().unregisterReceiver(broadcastReceiver);
-        getActivity().unregisterReceiver(headPhoneBroadCastReceiver);
-        Intent serviceIntent = new Intent(getActivity(), MusicService.class);
-        getActivity().stopService(serviceIntent);
-        saveToPreference();
+        try {
+            releaseMediaPlayer();
+            getActivity().unregisterReceiver(serviceClicksBroadcastReceiver);
+            getActivity().unregisterReceiver(headPhoneBroadCastReceiver);
+            getActivity().unregisterReceiver(bluetoothHeadPhonesBroadCastReceivers);
+            audioManager.unregisterMediaButtonEventReceiver(receiverComponent);
+            Intent serviceIntent = new Intent(getActivity(), MusicService.class);
+            getActivity().stopService(serviceIntent);
+            saveToPreference();
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "onDestroy\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void saveToPreference() {
@@ -682,7 +744,7 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
         editor.putInt(CURRENT_SONG_POSITION, currentSongClickedPosition);
         editor.putString(CURRENT_SONG_IMAGE_DATA, song.getCover());
         editor.putString(CURRENT_SONG_Title, song.getTitle());
-        editor.putBoolean(IS_LOOPING_EXTRA,isLooping);
+        editor.putBoolean(IS_LOOPING_EXTRA, isLooping);
         Log.e(TAG, "" + song.getData());
         editor.apply();
     }
