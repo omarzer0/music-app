@@ -1,23 +1,17 @@
 package com.azapps.musicplayer.ui.activity;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import com.azapps.musicplayer.R;
 import com.azapps.musicplayer.pojo.Utils;
 import com.azapps.musicplayer.ui.fragment.DisplaySongsFragment;
-import com.azapps.musicplayer.ui.fragment.MusicPlayerFragment;
 
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_DISPLAY_SONG;
-import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_MUSIC_PLAYER_TAG;
 
 public class HomeActivity extends AppCompatActivity {
     private DisplaySongsFragment displaySongsFragment;
-    private MusicPlayerFragment musicPlayerFragment;
     public static final String TAG = "HomeActivity";
 
     @Override
@@ -31,9 +25,9 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         int count = getSupportFragmentManager().getBackStackEntryCount();
-        if (count == 1){
+        if (count == 1) {
             moveTaskToBack(true);
-        }else {
+        } else {
             getSupportFragmentManager().popBackStack();
         }
     }
@@ -105,7 +99,7 @@ public class HomeActivity extends AppCompatActivity {
         displaySongsFragment.setOrderOfAudioFiles(alphaOrder);
     }
 
-    public void submitListChanges(int position){
+    public void submitListChanges(int position) {
         getDisplaySongFragmentInstance();
         displaySongsFragment.submitListChanges(position);
     }
@@ -115,12 +109,12 @@ public class HomeActivity extends AppCompatActivity {
         return displaySongsFragment.getSongCover();
     }
 
-    public boolean getLoopingState(){
+    public boolean getLoopingState() {
         getDisplaySongFragmentInstance();
         return displaySongsFragment.getLoopingState();
     }
 
-    public void setLoopingState(boolean state){
+    public void setLoopingState(boolean state) {
         getDisplaySongFragmentInstance();
         displaySongsFragment.setLoopingState(state);
     }

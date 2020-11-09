@@ -52,6 +52,7 @@ import com.azapps.musicplayer.broadcast.MediaButtonIntentReceiver;
 import com.azapps.musicplayer.pojo.Song;
 import com.azapps.musicplayer.pojo.Utils;
 import com.azapps.musicplayer.service.MusicService;
+import com.azapps.musicplayer.ui.activity.HomeActivity;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.io.File;
@@ -75,6 +76,7 @@ import static com.azapps.musicplayer.pojo.Constant.CURRENT_SONG_IMAGE_DATA;
 import static com.azapps.musicplayer.pojo.Constant.CURRENT_SONG_POSITION;
 import static com.azapps.musicplayer.pojo.Constant.CURRENT_SONG_Title;
 import static com.azapps.musicplayer.pojo.Constant.DELETE_BOTTOM_SHEET_TAG;
+import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_DISPLAY_SONG;
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_MUSIC_PLAYER_TAG;
 import static com.azapps.musicplayer.pojo.Constant.FRAGMENT_SEARCH_LOCAL_STORAGE_TAG;
 import static com.azapps.musicplayer.pojo.Constant.HEADPHONE_BLUETOOTH_EXTRA;
@@ -741,7 +743,10 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     private void saveToPreference() {
         SharedPreferences.Editor editor = getActivity().getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE).edit();
-        if (song == null) return;
+        if (song == null) {
+            Toast.makeText(getActivity(), "saveToPreference song == null", Toast.LENGTH_SHORT).show();
+            return;
+        }
         editor.putInt(CURRENT_SONG_POSITION, currentSongClickedPosition);
         editor.putString(CURRENT_SONG_IMAGE_DATA, song.getCover());
         editor.putString(CURRENT_SONG_Title, song.getTitle());
@@ -752,6 +757,10 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     private void getFromPreference() {
         SharedPreferences preferences = getActivity().getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
+        if (preferences == null) {
+            Toast.makeText(getActivity(), "getFromPreference preferences == null", Toast.LENGTH_SHORT).show();
+            return;
+        }
         currentSongClickedPosition = preferences.getInt(CURRENT_SONG_POSITION, -1);
         String cover = preferences.getString(CURRENT_SONG_IMAGE_DATA, "");
         String title = preferences.getString(CURRENT_SONG_Title, getString(R.string.choose_a_song));
