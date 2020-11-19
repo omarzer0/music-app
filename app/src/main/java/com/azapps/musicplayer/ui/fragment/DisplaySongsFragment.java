@@ -541,12 +541,8 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
 
     private void controlBodyClicked() {
         try {
-            if (song != null) {
-                Utils.replaceFragments(MusicPlayerFragment.newInstance(song.getTitle(),
-                        song.getArtist(), song.getData(), mp.getDuration(), song.getCover()),
-                        getActivity().getSupportFragmentManager(), R.id.fragment_display_songs_root_view, FRAGMENT_MUSIC_PLAYER_TAG);
-                constraintLayoutFound.setVisibility(View.GONE);
-            }
+            MusicPlayerFragment musicPlayerFragment = (MusicPlayerFragment) MusicPlayerFragment.newInstance(song.getTitle(),song.getArtist(), song.getData(), mp.getDuration(), song.getCover());
+            musicPlayerFragment.show(getActivity().getSupportFragmentManager(), FRAGMENT_MUSIC_PLAYER_TAG);
         } catch (Exception e) {
             Toast.makeText(getActivity(), "controlBodyClicked error\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -630,10 +626,6 @@ public class DisplaySongsFragment extends Fragment implements OnSongClickListene
     public void setLoopingState(boolean state) {
         isLooping = state;
         if (mp != null) mp.setLooping(isLooping);
-    }
-
-    public boolean getIsMpNull() {
-        return mp == null;
     }
 
     private BroadcastReceiver serviceClicksBroadcastReceiver = new BroadcastReceiver() {

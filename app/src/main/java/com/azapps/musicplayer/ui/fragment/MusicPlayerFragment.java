@@ -1,12 +1,15 @@
 package com.azapps.musicplayer.ui.fragment;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,11 +22,16 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.azapps.musicplayer.R;
 import com.azapps.musicplayer.ui.activity.HomeActivity;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import static com.azapps.musicplayer.pojo.Constant.ACTION_CLOSE;
@@ -38,7 +46,7 @@ import static com.azapps.musicplayer.pojo.Constant.BROADCAST_BLUETOOTH_HEADPHONE
 import static com.azapps.musicplayer.pojo.Constant.HEADPHONE_BLUETOOTH_EXTRA;
 import static com.azapps.musicplayer.pojo.Constant.MUSIC_BROADCAST_SEND_INTENT;
 
-public class MusicPlayerFragment extends Fragment implements View.OnClickListener {
+public class MusicPlayerFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
 
     private static final String TITLE_EXTRA = "title";
@@ -60,11 +68,9 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     //    private Song song;
     private int currentPosition;
     private String songTitle;
-    private String songData;
     private String songArtist;
     private int totalTime;
     private String cover;
-    private boolean isFirstTime = true;
 
     public MusicPlayerFragment() {
     }
@@ -89,7 +95,6 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         if (getArguments() != null) {
             songTitle = getArguments().getString(TITLE_EXTRA);
             songArtist = getArguments().getString(ARTIST_EXTRA);
-            songData = getArguments().getString(DATA_EXTRA);
             totalTime = getArguments().getInt(TOTAL_TIME_EXTRA);
             cover = getArguments().getString(SONG_COVER_EXTRA);
         }
@@ -97,8 +102,7 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        View view = inflater.inflate(R.layout.fragment_music_player, container, false);
+        final View view = inflater.inflate(R.layout.fragment_music_player, container, false);
         initViews(view);
         try {
             getSongExtra();
@@ -311,24 +315,6 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     };
 
 
-    private BroadcastReceiver headPhoneBroadCastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Intent.ACTION_HEADSET_PLUG)) {
-                int state = intent.getIntExtra("state", -1);
-//                if (state == 0) {
-//                    if (!isFirstTime) {
-//                        ((HomeActivity) getActivity()).playBtnClicked();
-//                        play();
-//                    } else {
-//                        isFirstTime = false;
-//                    }
-//                }
-            }
-        }
-    };
-
-
     private BroadcastReceiver bluetoothHeadPhonesBroadCastReceivers = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -353,12 +339,26 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         }
     };
 
+    @Nullable
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
+        View view = View.inflate(getContext(), R.layout.fragment_music_player, null);
+        dialog.setContentView(view);
+        BottomSheetBehavior mBehavior = BottomSheetBehavior.from((View) view.getParent());
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        mBehavior.setPeekHeight(height);
+        return dialog;
+    }
+
     @Override
     public void onStart() {
         super.onStart();
         try {
             getActivity().registerReceiver(serviceClicksBroadcastReceiver, new IntentFilter(MUSIC_BROADCAST_SEND_INTENT));
-            getActivity().registerReceiver(headPhoneBroadCastReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
             getActivity().registerReceiver(bluetoothHeadPhonesBroadCastReceivers, new IntentFilter(BROADCAST_BLUETOOTH_HEADPHONE_INTENT));
         } catch (Exception e) {
             Toast.makeText(getActivity(), "onStart\n" + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -366,7 +366,6 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
     }
 
     public void getSongChanged() {
-        songData = ((HomeActivity) getActivity()).getSongData();
         songTitle = ((HomeActivity) getActivity()).getSongTitle();
         songArtist = ((HomeActivity) getActivity()).getSongArtist();
         totalTime = ((HomeActivity) getActivity()).getSongTotalTime();
@@ -380,7 +379,6 @@ public class MusicPlayerFragment extends Fragment implements View.OnClickListene
         super.onDetach();
         try {
             getActivity().unregisterReceiver(serviceClicksBroadcastReceiver);
-            getActivity().unregisterReceiver(headPhoneBroadCastReceiver);
             getActivity().unregisterReceiver(bluetoothHeadPhonesBroadCastReceivers);
             getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             mSeekBarUpdateHandler.removeCallbacks(mUpdateSeekBar);

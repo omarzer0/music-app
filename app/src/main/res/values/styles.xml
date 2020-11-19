@@ -3,9 +3,9 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">#1A2028</item>
+        <item name="colorPrimaryDark">#000</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:navigationBarColor" tools:targetApi="lollipop">#1A2028</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">#000000</item>
         <item name="bottomSheetDialogTheme">@style/MyBottomSheetDialogTheme</item>
     </style>
 
@@ -23,7 +23,7 @@
     <style name="MyBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/MYBottomSheetStyle</item>
         <item name="android:windowIsFloating">false</item>
-        <item name="android:navigationBarColor" tools:targetApi="lollipop">#fff</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/main_color</item>
         <item name="colorPrimaryDark">@android:color/transparent</item>
     </style>
 
